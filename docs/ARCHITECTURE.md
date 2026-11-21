@@ -1,6 +1,13 @@
 # Architecture
 
-Status: **planned**. Only the scaffold exists today (a Next.js placeholder and a FastAPI `/health` endpoint). Update this file as pieces become real, and mark each one **built** or **planned**.
+Status: **mostly planned**. Built so far: a Next.js placeholder; a FastAPI `/health` endpoint that also checks the database; `api/core/` (settings, DB connection, `llm()` with fallback across Gemini, Groq and OpenRouter); and `api/db/schema.sql` (the `questions` table). Update this file as pieces become real, and mark each one **built** or **planned**.
+
+## Backend folders (built)
+| Folder | Holds |
+|---|---|
+| `api/core/` | Shared plumbing: `config.py` (env vars), `db.py` (`get_conn()`), `llm/models.py` (providers and fallback order), `llm/client.py` (`llm()`) |
+| `api/db/` | `schema.sql` (tables) and `init_db.py` (creates them) |
+| `api/<feature>/` | Planned: one folder per feature (`questions/`, `drafts/`, …), each with its own `prompts/` folder |
 
 ## Overview
 ```
@@ -53,7 +60,7 @@ post:     drafted → scheduled → sent | failed
 | `bot_hits` | user_agent, path, at |
 
 ## Secrets (environment variables, never committed)
-`DATABASE_URL`, `GEMINI_API_KEY`, `RESEND_API_KEY`, `BLUESKY_HANDLE`, `BLUESKY_APP_PASSWORD`, `ADMIN_PASSWORD`, `CRON_SECRET`, `REVIEW_LINK_SECRET`, `GOOGLE_SERVICE_ACCOUNT_JSON`, `GA4_PROPERTY_ID`, `NEXT_PUBLIC_GA_ID`, `API_URL`.
+`DATABASE_URL`, `GEMINI_API_KEY`, `GROQ_API_KEY`, `OPENROUTER_API_KEY`, `RESEND_API_KEY`, `BLUESKY_HANDLE`, `BLUESKY_APP_PASSWORD`, `ADMIN_PASSWORD`, `CRON_SECRET`, `REVIEW_LINK_SECRET`, `GOOGLE_SERVICE_ACCOUNT_JSON`, `GA4_PROPERTY_ID`, `NEXT_PUBLIC_GA_ID`, `API_URL`.
 
 ## Hosting
 - Two Vercel projects from this one repo: `web/` (the subdomain points here) and `api/`.

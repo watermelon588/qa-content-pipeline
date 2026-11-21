@@ -33,8 +33,8 @@ The user's global `~/.claude/CLAUDE.md` skill routine still applies. Say which s
 |---|---|---|
 | Frontend (public pages and admin) | Next.js (App Router, TypeScript, Tailwind) on Vercel | `web/` |
 | Backend (AI, jobs, integrations) | FastAPI (Python 3.13) on Vercel; Render free tier as fallback | `api/` |
-| Database | Neon Postgres. **Not added yet**, add it at Level 2 | — |
-| LLM | Gemini free tier (Flash-class), behind one function | `api/` |
+| Database | Neon Postgres via `psycopg` 3, plain SQL in `api/db/schema.sql` | `api/core/db.py`, `api/db/` |
+| LLM | `llm()` with fallback across Gemini, Groq, OpenRouter (free tiers), one `openai` client | `api/core/llm/` |
 | Social | Bluesky (`atproto` Python library) | `api/` |
 | Expert email | Resend with signed approve/edit/reject links | `api/` |
 | Scheduler | GitHub Actions cron or cron-job.org calling a secret-protected API endpoint | — |
@@ -44,6 +44,7 @@ The user's global `~/.claude/CLAUDE.md` skill routine still applies. Say which s
 - Web build/lint: `npm --prefix web run build`, `npm --prefix web run lint`
 - API setup: `python -m venv api/.venv` then `api/.venv/Scripts/python -m pip install -r api/requirements.txt`
 - API dev: `api/.venv/Scripts/python -m uvicorn main:app --app-dir api --reload --port 8000` (health check: `/health`)
+- API keys: copy `api/.env.example` to `api/.env`. Create tables: `cd api && .venv/Scripts/python -m db.init_db`. Test every LLM: `cd api && .venv/Scripts/python -m core.llm.client`
 - Preview in the desktop app: `.claude/launch.json` has `web` and `api` configs.
 
 ## Skills to use (load before each kind of work)

@@ -17,7 +17,7 @@ Short records of each choice and why we made it. Add new entries at the bottom. 
 ### D4: Neon Postgres. *Accepted, 2026-11-20 (added at Level 2, not before)*
 **Why:** free serverless Postgres that works with serverless functions. **Alternative:** Supabase (built-in auth, but free projects pause when idle). Admin login is just an `ADMIN_PASSWORD` environment variable.
 
-### D5: Gemini free tier (Flash-class) behind one `llm()` function. *To verify the limits*
+### D5: Gemini free tier (Flash-class) behind one `llm()` function. *Superseded by D13*
 **Why:** it has a genuine free tier. Grok's free API access is uncertain. A single wrapper makes swapping models a one-line change.
 
 ### D6: Bluesky only for social. *Accepted, 2026-11-20*
@@ -41,3 +41,11 @@ Skip Level 7. Exactly 2 question sources. 8–10 answers (the hard cap of 20 sta
 
 ### D12: Scaffold has no DB or extra libraries. *Accepted, 2026-11-20*
 **Why:** YAGNI. Each level adds only what it needs.
+
+### D13: Three free LLM providers with fallback, through one `openai` client. *Accepted, 2026-11-20*
+**Why:** the user wanted Gemini, Groq and OpenRouter. All three accept the OpenAI chat API, so one library (`openai`) talks to all of them; only the base URL and key change. `llm()` in `api/core/llm/client.py` tries the models in `FALLBACK` (`api/core/llm/models.py`) in order and moves on when one fails. A provider with no key is skipped.
+**Order:** `gemini-3.8-flash` → Groq `openai/gpt-oss-120b` → Groq `openai/gpt-oss-20b` → `gemini-3.5-flash-lite`. OpenRouter is added once its key is in and a `:free` model is picked (free tier is 20 req/min and 50 req/day).
+**To verify:** Gemini free-tier numbers (only visible in AI Studio when logged in) and whether Groq's published table is the free plan.
+
+### D14: Database driver is `psycopg` 3 with plain SQL. *Accepted, 2026-11-20*
+**Why:** no ORM to learn or explain. Tables live in `api/db/schema.sql`; `python -m db.init_db` creates them. Each level adds only its own tables.
