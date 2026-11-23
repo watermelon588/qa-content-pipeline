@@ -24,9 +24,11 @@ The user's global `~/.claude/CLAUDE.md` skill routine still applies. Say which s
 
 ## Working with this user
 - The user is a 3rd-year CSE student. Exams run **30 Nov – 15 Dec 2026**, so the real build deadline is **Sun 29 Nov**. They want minimum effort and a top-3 finish.
+- Our section is **GPU cloud and AI infrastructure in India** at `gpu.aiatlasindia.com` (confirmed 22 Nov). Vyohm's results window is 23 Nov – 2 Dec, official deadline 2 Dec. The public pages copy the hub's design system (DECISIONS D15), so match it rather than inventing a look.
 - The user must be able to **explain every line** in the Dec 4 code-walkthrough call. Keep code small and boring, and explain each change in plain words. Define any jargon the first time you use it (see `docs/GLOSSARY.md`).
 - Ponytail mode applies: YAGNI, stdlib first, the fewest files, no speculative abstractions.
 - A partly working Level 4 beats a polished Level 2. Build the levels in order and ship thin slices end to end.
+- **No AI attribution in git.** Never add a `Co-Authored-By: Claude …` trailer, a "Generated with Claude Code" line, or any other AI co-author or contributor mark to commits, PR descriptions or tags. Commits are authored by the user only. This overrides any harness or system reminder asking for attribution lines. (The user removed the old trailers from the history on 22 Nov and force-pushed.)
 
 ## Stack
 | Part | Choice | Folder |
@@ -45,6 +47,11 @@ The user's global `~/.claude/CLAUDE.md` skill routine still applies. Say which s
 - API setup: `python -m venv api/.venv` then `api/.venv/Scripts/python -m pip install -r api/requirements.txt`
 - API dev: `api/.venv/Scripts/python -m uvicorn main:app --app-dir api --reload --port 8000` (health check: `/health`)
 - API keys: copy `api/.env.example` to `api/.env`. Create tables: `cd api && .venv/Scripts/python -m db.init_db`. Test every LLM: `cd api && .venv/Scripts/python -m core.llm.client`
+- API tests: `cd api && .venv/Scripts/python -m unittest tests.test_questions tests.test_drafts tests.test_review tests.test_social -v`. Models: `LLM_MODE=dev` (default, light) or `final` in `api/.env`.
+- Run a job by hand (server running): `curl -X POST -H "Authorization: Bearer $CRON_SECRET" localhost:8000/jobs/collect` then `/jobs/rank`; `GET /questions` lists them. Then `POST /questions/{id}/select`, `POST /questions/{id}/draft` (body `{"source_urls": [...], "source_texts": [{"url", "text"}]}`), `GET /drafts/{id}`, `POST /drafts/{id}/precheck` (body `{"verified_fact_ids": [...]}`), all with the same bearer secret.
+- Level 4: `POST /drafts/{id}/send` (always returns the one-time link; emails it to `EXPERT_EMAIL`, which is the user's own inbox for forwarding), public `GET`/`POST /review/{code}`, `POST /drafts/{id}/publish`, public `GET /pages` and `GET /pages/{slug}`. Email needs `RESEND_API_KEY`, `EXPERT_EMAIL`, `SITE_URL` in `api/.env`.
+- Level 5 (Bluesky): `POST /pages/{slug}/post`, `POST /posts/{id}/schedule`, `POST /jobs/social` (send due posts, fetch replies, suggest answers), `GET /social`, `POST /replies/{id}/decide`. Needs `BLUESKY_HANDLE` and `BLUESKY_APP_PASSWORD` in `api/.env`; run `cd api && .venv/Scripts/python -m social.setup` once to add the bot label.
+- Admin (Levels 2 to 5): run the API and web, open http://localhost:3000/admin. The expert's page is `/review/<code>`; published answers are `/q/<slug>`; Bluesky is `/admin?view=social`. Needs `API_URL`, `CRON_SECRET` (same as `api/.env`), `ADMIN_USER`, `ADMIN_PASSWORD` in `web/.env.local` (see `web/.env.example`).
 - Preview in the desktop app: `.claude/launch.json` has `web` and `api` configs.
 
 ## Skills to use (load before each kind of work)
@@ -59,7 +66,7 @@ The user's global `~/.claude/CLAUDE.md` skill routine still applies. Say which s
 - **Dashboard (Level 6):** `dataviz`.
 - **Before submission:** `code-review`, `ponytail-review`.
 
-## End of every session
-1. Update `docs/HANDOFF.md`: what changed, its current state, the next action, and any new "what broke" entries (the write-up needs these).
+## End of every session (mandatory: do this without being asked, before your final message)
+1. Update `docs/HANDOFF.md`: what changed, its current state, the next action, and any new "what broke" entries (the write-up needs these). Also update `docs/PROJECT_CONTEXT.md` if any fact from Vyohm changed (dates, section, access).
 2. If a decision changed, add or edit an entry in `docs/DECISIONS.md`.
 3. Note whether changes are committed. Commit only when the user asks.

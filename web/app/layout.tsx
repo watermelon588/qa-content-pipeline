@@ -1,37 +1,29 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { OWNERSHIP_LINE, SECTION_NAME } from "@/lib/site";
+import { Bricolage_Grotesque, IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
+import { SECTION_LEDE, SECTION_NAME, SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+// The three typefaces of the AI Atlas India kit. next/font downloads them at build time and serves
+// them from our own domain, so the page makes no request to Google when someone visits.
+const display = Bricolage_Grotesque({ variable: "--font-display", subsets: ["latin"] });
+const body = IBM_Plex_Sans({ variable: "--font-body", subsets: ["latin"], weight: ["400", "500", "600"] });
+const mono = IBM_Plex_Mono({ variable: "--font-mono", subsets: ["latin"], weight: ["400", "500"] });
 
 export const metadata: Metadata = {
-  title: `${SECTION_NAME} | AI Atlas India`,
-  description: "Answers to the questions Indian business owners ask before buying AI, reviewed by a named expert.",
+  metadataBase: new URL(SITE_URL),
+  title: { default: `${SECTION_NAME} | ${SITE_NAME}`, template: `%s | ${SITE_NAME}` },
+  description: SECTION_LEDE,
+  icons: { icon: "/favicon.svg" },
+  openGraph: { siteName: SITE_NAME, type: "website", locale: "en_IN" },
+  twitter: { card: "summary" },
 };
 
+// The shell every page shares. The public header and footer live in app/(site)/layout.tsx,
+// so the admin screens (app/admin) don't carry them.
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">
-        <header className="border-b px-4 py-3 flex gap-3 items-baseline">
-          <a href="https://aiatlasindia.com" className="font-semibold">AI Atlas India</a>
-          <span className="text-sm opacity-70">{SECTION_NAME}</span>
-        </header>
-        <main className="flex-1 px-4 py-8">{children}</main>
-        <footer className="border-t px-4 py-4 text-sm opacity-70">{OWNERSHIP_LINE}</footer>
-      </body>
+    <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable}`}>
+      <body data-section="gpu">{children}</body>
     </html>
   );
 }

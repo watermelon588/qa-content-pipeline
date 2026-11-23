@@ -23,11 +23,11 @@ The output is a section of **aiatlasindia.com** (Vyohm's guide to AI providers i
 ## 2. Key dates (all 2026, all IST)
 | Date | What |
 |---|---|
-| Fri 20 Nov | Spot confirmed. Vyohm sends the setup email (section, subdomain, GA4, Search Console). |
-| Sat 21 Nov – Mon 30 Nov | **Results window.** Traffic is counted over these dates, the same for everyone. |
-| Sat 28 Nov | Reminder email from Vyohm. |
+| Sun 22 Nov | Setup email arrived (late). Section and subdomain confirmed. Dates moved for everyone. |
+| Mon 23 Nov – Wed 2 Dec | **Results window (moved from 21–30 Nov).** Traffic is counted over these dates, the same for everyone. |
+| Sat 28 Nov | Reminder email from Vyohm (original date, may have moved). |
 | **Sun 29 Nov** | **Our real deadline.** The user's exams start Mon 30 Nov. |
-| Mon 30 Nov, 11:59 PM | Official submission deadline. |
+| Wed 2 Dec, 11:59 PM IST | Official submission deadline (moved from Mon 30 Nov). |
 | By Tue 1 Dec | Vyohm confirms receipt. |
 | By Fri 4 Dec | Review, plus **short calls with the strongest entries to walk through their code**. This falls during exams. |
 | Sun 6 Dec | Results and prizes. |
@@ -36,7 +36,10 @@ The output is a section of **aiatlasindia.com** (Vyohm's guide to AI providers i
 ## 3. Arrangements with Vyohm (from the email thread, 19 Nov)
 - **Spot confirmed** on the software track.
 - **LinkedIn post is waived.** HR wrote that the demo can be shared on **YouTube or X, or sent directly with the submission** instead of the LinkedIn post. Quote this in the submission email, because the guide still says LinkedIn is required. Keep that email.
-- **Section choices:** 1st choice "GPU cloud and AI infrastructure in India" (`gpu.aiatlasindia.com`); 2nd choice "AI CRM and sales tools for small businesses" (`crm.aiatlasindia.com`). **Not yet confirmed.** It will be in the setup email. Sections go to whoever asks first.
+- **Section: CONFIRMED on 22 Nov (setup email from Vyohm).** "GPU cloud and AI infrastructure in India" at `gpu.aiatlasindia.com` (the 1st choice). The hub lists it as "GPU and cloud", Plate 06B2, with the line "Where to rent compute in India and what it costs."
+- **Received 23 Nov (second setup email):** GA4 measurement ID `G-54RWD73RW5` (property "AI Atlas India - gpu", the user has Viewer access); Search Console full access to `https://gpu.aiatlasindia.com/` (submit the sitemap there once live); the section kit at aiatlasindia.com/kit/aiatlasindia-kit.zip (header.html, footer.html, tokens.css, logo.svg; rules at aiatlasindia.com/kit/, but ignore its "Going live" part).
+- **Delivery (23 Nov, replaces the 22 Nov PR plan):** no shared repository. We host the public pages and the engine ourselves (Vercel, Netlify or Cloudflare Pages), add `gpu.aiatlasindia.com` as a custom domain, and reply to the email with the DNS record the host shows (type, name, value). Vyohm adds it within 12 hours. Nothing goes into their repository. See D17.
+- **Kit rules worth remembering:** use the header, footer, tokens and logo unchanged; the logo on ink has a yellow marker; never add colours; never add trackers of our own (the GA4 tag is theirs, so it is allowed); caption AI images "Illustration"; label Vyohm products with the ownership label.
 - **Prize:** top 3 get ₹3,000, ₹2,000 or ₹1,000 plus a paid internship offer (6 months, ₹15,000–22,000/month depending on hours).
 - The guide does **not** say whether there is a further interview after winning. It says the assignment "stands in for" the missed in-person round. Assume the Dec 4 call is a code walkthrough, so the user must understand all the code.
 
@@ -77,14 +80,14 @@ The output is a section of **aiatlasindia.com** (Vyohm's guide to AI providers i
 - [ ] One social account linked (Bluesky), **marked as automated** with the bot self-label.
 
 ### Level 2: Find questions
-- [ ] Questions from **at least two sources**, through official APIs or exports. Options: Search Console queries, Google Trends export, Stack Exchange API, Bluesky/Mastodon search, YouTube Data API comments, Hacker News API.
+- [x] (done 22 Nov: Stack Exchange and Hacker News, see DECISIONS D18) Questions from **at least two sources**, through official APIs or exports. Options: Search Console queries, Google Trends export, Stack Exchange API, Bluesky/Mastodon search, YouTube Data API comments, Hacker News API.
 - [ ] Never scrape Google results, "People also ask", or Quora. No Reddit.
-- [ ] Rank the questions, with a stored reason for each pick.
-- [ ] Merge near-duplicates: one strong page per question.
+- [x] Rank the questions, with a stored reason for each pick. (done 22 Nov, `questions.rank_reason`)
+- [x] Merge near-duplicates: one strong page per question. (done 22 Nov within a batch, `questions.merged_into`; see the ponytail note in `rank.py` for the limit)
 
 ### Level 3: AI drafts answers
-- [ ] Each draft cites its sources and stays a draft until checked.
-- [ ] The AI also drafts the page title, meta description, image alt text and structured data. All are checked with the answer.
+- [x] Each draft cites its sources and stays a draft until checked. (S6: every fact has a quote and date; `prechecked` needs every fact ticked)
+- [x] The AI also drafts the page title, meta description, image alt text and structured data. All are checked with the answer. (S6: JSON-LD is built by code from the checked fields; title, meta and alt are reviewed by the expert in Level 4)
 - [ ] Every answer adds something a generic AI summary wouldn't: the expert's own advice, a real price checked on a date, a screenshot, or a worked example.
 
 ### Level 4: Expert check
@@ -165,10 +168,12 @@ If done: use our own GrowthBook or PostHog account; write the hypothesis, metric
 - **Priority:** get the site live early (impressions count from Nov 21), and get the first 3 drafts to the expert by about Nov 23.
 
 ## 12. Open questions
-- [ ] Which section is assigned? (Setup email.)
-- [ ] Who is the expert? (The user is lining someone up after the section is confirmed.)
+- [x] Which section is assigned? GPU cloud and AI infrastructure in India (22 Nov).
+- [x] How does the section reach the subdomain? We host it; Vyohm adds our DNS record (23 Nov, D17).
+- [x] Which footer wording does the kit use? The hub's sentence. We show it unchanged plus the guide's exact line (D16).
+- [ ] Who is the expert? (The user is lining someone up.)
 - [ ] Ask Vyohm: is a student with hands-on cloud experience acceptable as the expert?
 - [ ] Ask Vyohm: what format is the Dec 4 call? (Exams.)
 - [ ] Ask Vyohm: can a service account get GA4 and Search Console API read access?
 - [ ] Verify the current free-tier limits: Vercel (cron, function timeout, logs), Neon, Gemini, Resend.
-- [ ] Verify how to set the Bluesky bot self-label.
+- [x] Verify how to set the Bluesky bot self-label. (23 Nov: profile self-label `bot`, set by `python -m social.setup`; D25)
