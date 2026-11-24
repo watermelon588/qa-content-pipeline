@@ -8,6 +8,10 @@ import Markdown from "@/components/Markdown";
 import { precheckDraft, publishDraft, sendToExpert } from "../_lib/actions";
 import { hostOf, type Draft } from "../_lib/api";
 
+// Exact time in India time, e.g. "24 Nov, 10:05 am".
+const when = (iso: string) =>
+  new Date(iso).toLocaleString("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
+
 export default function DraftView({ draft }: { draft: Draft }) {
   const s = draft.status;
   const open = s === "draft"; // only an unchecked draft can be ticked
@@ -56,6 +60,15 @@ export default function DraftView({ draft }: { draft: Draft }) {
             <div><dt>Image alt text (describes the page&apos;s image for screen readers)</dt><dd>{draft.alt_text}</dd></div>
           </dl>
         </header>
+
+        <details className="dv-timeline" open>
+          <summary>Timeline (India time)</summary>
+          <ol>
+            {draft.timeline.map((t, i) => (
+              <li key={i}><time dateTime={t.at}>{when(t.at)}</time> {t.step}</li>
+            ))}
+          </ol>
+        </details>
 
         {review && (
           <section className="dv-review" aria-labelledby="review-h">

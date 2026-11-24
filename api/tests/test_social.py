@@ -45,7 +45,7 @@ class LinkTest(unittest.TestCase):
         card = page_card("h100-price", "H100 prices", "What it costs", "https://gpu.aiatlasindia.com")
         record = make_post("Read this", card=card)
         self.assertEqual(record["embed"]["$type"], "app.bsky.embed.external")
-        self.assertEqual(record["embed"]["external"]["uri"], "https://gpu.aiatlasindia.com/q/h100-price")
+        self.assertEqual(record["embed"]["external"]["uri"], "https://gpu.aiatlasindia.com/q/h100-price?utm_source=bluesky&utm_medium=social")
 
 
 class WhoWeAnswerTest(unittest.TestCase):

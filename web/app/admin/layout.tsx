@@ -16,6 +16,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <nav className="adm-top__nav" aria-label="Desk">
             <Link href="/admin" className="adm-top__desk">Answers</Link>
             <Link href="/admin?view=social" className="adm-top__desk">Bluesky</Link>
+            <Link href="/admin?view=results" className="adm-top__desk">Results</Link>
           </nav>
         </div>
       </header>

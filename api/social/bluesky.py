@@ -1,5 +1,5 @@
 """The only code that talks to Bluesky. Standard library, no SDK (same as the rest of the API, DECISIONS D20).
-It can log in, post, reply, read notifications and label the account as a bot. Nothing else: there is
+It can log in, post, reply, read notifications, read our posts' like/repost counts and label the account as a bot. Nothing else: there is
 deliberately no follow, like, repost or DM function (the guide's rules).
 Sources (read 22 Nov 2026): https://docs.bsky.app/docs/advanced-guides/posts (post record, link cards, replies)
 and the lexicons in github.com/bluesky-social/atproto (packages/api/lexicons/app/bsky/...)."""
@@ -55,6 +55,11 @@ def notifications(session, limit=50):
     """Our newest notifications, only the replies and mentions (the only people we may answer)."""
     return _call("app.bsky.notification.listNotifications", session,
                  params={"limit": limit, "reasons": ["reply", "mention"]})["notifications"]
+
+
+def post_counts(session, uris):
+    """Like, repost, reply and quote counts for up to 25 of our posts (app.bsky.feed.getPosts takes 25 at most)."""
+    return _call("app.bsky.feed.getPosts", session, params={"uris": uris[:25]})["posts"]
 
 
 def mark_as_bot(session):

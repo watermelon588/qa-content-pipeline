@@ -46,5 +46,5 @@ def select_question(question_id: int):
         if merged_into is not None:  # answering a duplicate would publish the same page twice
             raise HTTPException(status_code=409, detail=f"this repeats question {merged_into}; select that one")
         check_move("question", status, "selected")
-        conn.execute("UPDATE questions SET status = 'selected' WHERE id = %s", (question_id,))
+        conn.execute("UPDATE questions SET status = 'selected', selected_at = now() WHERE id = %s", (question_id,))
     return {"id": question_id, "status": "selected"}

@@ -149,3 +149,30 @@ export async function publishDraft(_: Result, form: FormData): Promise<Result> {
     return fail(e); // includes the API's "20 answers is the most" refusal
   }
 }
+
+// ---------- Level 6: results ----------
+export async function uploadExport(_: Result, form: FormData): Promise<Result> {
+  const file = form.get("file");
+  if (!(file instanceof File) || file.size === 0) return { ok: false, message: "Choose a CSV file first." };
+  if (file.size > 2_000_000) return { ok: false, message: "That file is over 2 MB. Export fewer rows." };
+  try {
+    const r = await api<{ rows: number }>("/uploads", {
+      method: "POST",
+      body: { kind: String(form.get("kind")), filename: file.name, text: await file.text() },
+    });
+    refresh();
+    return { ok: true, message: `Uploaded ${file.name}: ${r.rows} rows.` };
+  } catch (e) {
+    return fail(e);
+  }
+}
+
+export async function askForSuggestions(): Promise<Result> {
+  try {
+    const r = await api<{ picks: unknown[] }>("/jobs/suggest", { method: "POST" });
+    refresh();
+    return { ok: true, message: `The AI suggested ${r.picks.length} question${r.picks.length === 1 ? "" : "s"}. You pick.` };
+  } catch (e) {
+    return fail(e);
+  }
+}

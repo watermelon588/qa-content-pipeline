@@ -8,6 +8,7 @@ from core.db import get_conn
 from core.status import check_move
 from drafts.draft import generate, save_draft
 from drafts.sources import gather
+from drafts.timeline import timeline
 
 router = APIRouter(dependencies=[Depends(require_secret)])
 
@@ -85,6 +86,7 @@ def get_draft(draft_id: int):
         cur.execute("SELECT slug FROM pages WHERE draft_id = %s", (draft_id,))
         page = cur.fetchone()
         draft["slug"] = page["slug"] if page else None
+        draft["timeline"] = timeline(cur, draft_id)  # when each step happened
         return draft
 
 
@@ -102,6 +104,6 @@ def precheck(draft_id: int, request: PrecheckRequest):
         left = [r[0] for r in conn.execute("SELECT id FROM facts WHERE draft_id = %s AND NOT verified ORDER BY n", (draft_id,))]
         if left:
             return {"status": row[0], "unverified_fact_ids": left}
-        conn.execute("UPDATE drafts SET status = 'prechecked' WHERE id = %s", (draft_id,))
+        conn.execute("UPDATE drafts SET status = 'prechecked', prechecked_at = now() WHERE id = %s", (draft_id,))
     return {"status": "prechecked", "unverified_fact_ids": []}
 # Older versions of a draft stay as they are; review/router.py sends only the newest version to the expert.

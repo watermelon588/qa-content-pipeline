@@ -16,8 +16,8 @@ export const OWNERSHIP_LINE =
 
 // Who is credited on the About page. null = not confirmed yet, the page says so honestly.
 export const BUILDER_NAME = "Rohit Maity";
-export const EXPERT_NAME: string | null = null; // set only after the expert agrees in writing to be named
-export const BLUESKY_URL: string | null = null; // set once the automated account exists
+export const EXPERT_NAME: string | null = "Sanath W, Senior DevOps Engineer"; // agreed in writing to be named, 24 Nov 2026
+export const BLUESKY_URL: string | null = "https://bsky.app/profile/watermelon588.bsky.social"; // set once the automated account exists
 
 // Links into the shared hub. These pages belong to Vyohm's hub, not to this section.
 const hub = (path: string) => `${HUB_URL}${path}`;

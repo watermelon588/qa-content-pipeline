@@ -14,7 +14,7 @@ from core.auth import require_secret
 from core.db import get_conn
 from core.status import check_move
 from social import bluesky
-from social.jobs import draft_replies, fetch_replies, send_due_posts
+from social.jobs import draft_replies, fetch_replies, refresh_post_stats, send_due_posts
 from social.social import check_text, decision_for, make_post, reply_refs
 from social.write import write_post
 
@@ -91,6 +91,7 @@ def run_social():
     try:
         sent = send_due_posts(session)
         new = fetch_replies(session)
+        refresh_post_stats(session)
     except OSError as e:
         raise HTTPException(status_code=502, detail=f"Bluesky did not answer ({e})") from e
     try:

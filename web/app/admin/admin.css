@@ -277,3 +277,29 @@
 .adm-problem { margin: 24px auto; max-width: 760px; padding: 16px 20px; border: 2px solid var(--atlas-route); background: #fef3f2; line-height: 1.6; }
 .adm-problem p + p { margin-top: 8px; font-size: 0.875rem; }
 .adm-problem code { font-size: 0.8125rem; overflow-wrap: anywhere; }
+
+/* ---------- Level 6: results ---------- */
+.res-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: var(--atlas-space-3); margin-top: var(--atlas-space-4); }
+.res-tile { border: var(--atlas-border); background: var(--atlas-paper); padding: var(--atlas-space-3) var(--atlas-space-4); display: grid; gap: 4px; align-content: start; }
+.res-tile dt { font: 500 12px var(--atlas-font-mono); text-transform: uppercase; letter-spacing: 0.06em; }
+.res-tile__value { font: 700 2.25rem/1.1 var(--atlas-font-display); font-variant-numeric: tabular-nums; }
+.res-tile__note { font-size: 0.8125rem; line-height: 1.4; color: var(--atlas-muted); overflow-wrap: anywhere; }
+.res-suggest { margin-top: var(--atlas-space-5); display: grid; gap: var(--atlas-space-3); }
+.res-insight { max-width: 70ch; font-size: 1.0625rem; line-height: 1.6; }
+.res-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: var(--atlas-space-5); align-items: start; }
+.res-scroll { overflow-x: auto; max-width: 100%; }
+.res-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; background: var(--atlas-paper); }
+.res-table th, .res-table td { text-align: left; padding: 8px 12px; border-bottom: var(--atlas-row-rule); vertical-align: top; }
+.res-table th { font: 500 12px var(--atlas-font-mono); text-transform: uppercase; letter-spacing: 0.04em; border-bottom: var(--atlas-border); white-space: nowrap; }
+.res-table td { font-variant-numeric: tabular-nums; }
+.res-upload { margin-bottom: var(--atlas-space-2); }
+.res-upload .af-fields { display: flex; flex-wrap: wrap; align-items: end; gap: var(--atlas-space-3); }
+.res-upload-card { margin-top: var(--atlas-space-5); display: grid; gap: var(--atlas-space-2); }
+.res-totals { display: flex; flex-wrap: wrap; gap: 4px 20px; font-size: 0.9375rem; }
+.res-upload .so-field { width: auto; }
+
+/* Timeline on the draft screen: one line per step, the time in mono so the column lines up */
+.dv-timeline { margin-block: var(--atlas-space-4); border: var(--atlas-border); background: var(--atlas-paper); padding: var(--atlas-space-3) var(--atlas-space-4); }
+.dv-timeline summary { cursor: pointer; font: 500 12px var(--atlas-font-mono); text-transform: uppercase; letter-spacing: 0.06em; }
+.dv-timeline ol { list-style: none; margin-top: var(--atlas-space-2); display: grid; gap: 4px; font-size: 0.875rem; }
+.dv-timeline time { display: inline-block; min-width: 9.5em; font: 400 0.8125rem var(--atlas-font-mono); color: var(--atlas-muted); }

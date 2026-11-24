@@ -47,6 +47,7 @@ export type Draft = DraftSummary & {
   facts: Fact[];
   review: Review | null;
   slug: string | null; // set once published
+  timeline: { step: string; at: string }[]; // when each step happened, oldest first
 };
 
 /** Everything the question screens need, in one go. */
@@ -153,3 +154,49 @@ export const istInput = (iso: string | null) =>
 export const scoreText =(s: number | null) => (s === null ? "unscored" : s.toFixed(1));
 
 export const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
+
+// ---------- Level 6: results ----------
+export type Upload = {
+  kind: "ga4" | "gsc" | "gsc_ai";
+  filename: string;
+  header: string[];
+  rows: string[][]; // the top rows only
+  row_count: number;
+  totals: Record<string, number>; // count columns added up (clicks, impressions, users...)
+  uploaded_at: string;
+};
+
+export type PostStats = {
+  slug: string;
+  title: string;
+  uri: string;
+  sent_at: string;
+  likes: number;
+  reposts: number;
+  replies: number;
+  quotes: number;
+  stats_at: string | null;
+};
+
+export type Suggestion = {
+  insight: string;
+  picks: { question_id: number; reason: string; text: string; status: Question["status"] }[];
+  created_at: string;
+};
+
+export type Stats = {
+  ai: { kind: "crawler" | "referral"; name: string; visits: number }[]; // last 30 days
+  ai_pages: { path: string; referrals: number | null; crawls: number | null }[];
+  uploads: Upload[];
+  posts: PostStats[];
+  published: number;
+  suggestion: Suggestion | null;
+};
+
+export const loadStats = () => api<Stats>("/stats");
+
+export const UPLOAD_KINDS: Record<Upload["kind"], string> = {
+  ga4: "GA4 report",
+  gsc: "Search Console",
+  gsc_ai: "Search Console: Generative AI",
+};

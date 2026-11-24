@@ -1,0 +1,27 @@
+# The scheduler. GitHub runs this on its own and calls our API's job endpoints with the secret.
+# Needs two repository secrets (Settings > Secrets and variables > Actions): API_URL (e.g. https://<api>.vercel.app)
+# and CRON_SECRET (the same value as in api/.env). Until API_URL is set, every step is skipped.
+# GitHub may start a scheduled run a few minutes late; a post goes out at the first run after its time.
+name: jobs
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"  # every 30 minutes: send due Bluesky posts, fetch replies, refresh post counts
+    - cron: "30 0 * * *"    # once a day at 06:00 India time: collect new questions and rank them
+  workflow_dispatch:         # the "Run workflow" button, for a manual run
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    env:
+      API_URL: ${{ secrets.API_URL }}
+      CRON_SECRET: ${{ secrets.CRON_SECRET }}
+    steps:
+      - name: Bluesky (posts, replies, counts)
+        if: env.API_URL != ''
+        run: curl -fsS -X POST -H "Authorization: Bearer $CRON_SECRET" "$API_URL/jobs/social"
+      - name: Collect and rank questions (daily run or manual)
+        if: env.API_URL != '' && github.event.schedule != '*/30 * * * *'
+        run: |
+          curl -fsS -X POST -H "Authorization: Bearer $CRON_SECRET" "$API_URL/jobs/collect"
+          curl -fsS -X POST -H "Authorization: Bearer $CRON_SECRET" "$API_URL/jobs/rank" --max-time 280

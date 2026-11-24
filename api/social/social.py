@@ -46,9 +46,10 @@ def make_post(text, card=None, reply=None):
 
 
 def page_card(slug, title, description, site_url):
-    """The preview box (title and summary) Bluesky shows under a post, linking to our answer page."""
+    """The preview box (title and summary) Bluesky shows under a post, linking to our answer page. The utm tags let
+    GA4 count visits from our posts; the page's canonical link stays the plain address."""
     return {"$type": "app.bsky.embed.external",
-            "external": {"uri": f"{site_url}/q/{slug}", "title": title, "description": description}}
+            "external": {"uri": f"{site_url}/q/{slug}?utm_source=bluesky&utm_medium=social", "title": title, "description": description}}
 
 
 def to_answer(notifications, our_did):

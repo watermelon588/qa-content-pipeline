@@ -3,6 +3,7 @@
 //   /admin?q=12      two columns: every question on the left, question 12 and its next step on the right
 //   /admin?draft=7   two columns: draft 7 to read on the left, its facts to check on the right
 //   /admin?view=social   Bluesky: posts for published answers, and replies waiting for your approval
+//   /admin?view=results  Level 6: AI traffic, uploaded GA4 / Search Console exports, post results, what to answer next
 import Link from "next/link";
 import { Suspense } from "react";
 import ActionForm from "@/components/ActionForm";
@@ -10,8 +11,9 @@ import DraftView from "./_components/DraftView";
 import Problem from "./_components/Problem";
 import QuestionPanel from "./_components/QuestionPanel";
 import { collectQuestions, rankQuestions, selectQuestion } from "./_lib/actions";
+import ResultsView from "./_components/ResultsView";
 import SocialView from "./_components/SocialView";
-import { hostOf, loadDraft, loadPipeline, loadSocial, nextStep, one, scoreText, stageOf, STEPS, TARGET, type Pipeline } from "./_lib/api";
+import { hostOf, loadDraft, loadPipeline, loadSocial, loadStats, nextStep, one, scoreText, stageOf, STEPS, TARGET, type Pipeline } from "./_lib/api";
 
 export default function AdminPage({ searchParams }: PageProps<"/admin">) {
   return (
@@ -28,6 +30,11 @@ async function Desk({ searchParams }: { searchParams: PageProps<"/admin">["searc
   if (one(params.view) === "social") {
     const social = await loadSocial().catch((e: Error) => e);
     return social instanceof Error ? <Problem error={social} /> : <SocialView {...social} />;
+  }
+
+  if (one(params.view) === "results") {
+    const stats = await loadStats().catch((e: Error) => e);
+    return stats instanceof Error ? <Problem error={stats} /> : <ResultsView {...stats} />;
   }
 
   const draftId = one(params.draft);

@@ -6,6 +6,7 @@ from pages.router import router as pages_router
 from questions.router import router as questions_router
 from review.router import router as review_router
 from social.router import router as social_router
+from stats.router import router as stats_router
 
 app = FastAPI(title="AI Atlas India content engine API")
 
@@ -15,6 +16,7 @@ app.include_router(drafts_router)
 app.include_router(review_router)
 app.include_router(pages_router)
 app.include_router(social_router)
+app.include_router(stats_router)
 
 
 @app.get("/health")

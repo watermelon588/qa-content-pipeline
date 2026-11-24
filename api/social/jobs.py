@@ -1,7 +1,8 @@
 """What POST /jobs/social does each time the scheduler (or the "Check Bluesky now" button) calls it:
 1. send every scheduled post whose time has come;
 2. fetch new replies and mentions;
-3. let the LLM suggest an answer to a few of them (a person still approves each one in the admin)."""
+3. let the LLM suggest an answer to a few of them (a person still approves each one in the admin);
+4. copy each sent post's like, repost, reply and quote counts for the dashboard (Level 6)."""
 from psycopg.rows import dict_row
 
 from core.config import SITE_URL
@@ -78,3 +79,15 @@ def draft_replies():
                          (text, r["id"]))
         drafted += 1
     return drafted
+
+
+def refresh_post_stats(session):
+    """Copy Bluesky's counts for our 25 newest sent posts into the posts table. Returns how many were updated."""
+    with get_conn() as conn:
+        uris = [u for (u,) in conn.execute("SELECT uri FROM posts WHERE status = 'sent' ORDER BY sent_at DESC LIMIT 25")]
+        if not uris:
+            return 0
+        for p in bluesky.post_counts(session, uris):
+            conn.execute("UPDATE posts SET likes = %s, reposts = %s, replies = %s, quotes = %s, stats_at = now() WHERE uri = %s",
+                         (p.get("likeCount", 0), p.get("repostCount", 0), p.get("replyCount", 0), p.get("quoteCount", 0), p["uri"]))
+    return len(uris)

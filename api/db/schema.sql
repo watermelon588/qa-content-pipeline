@@ -109,3 +109,45 @@ CREATE TABLE IF NOT EXISTS replies (
     decided_at TIMESTAMPTZ,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Level 6: how each Bluesky post performed. POST /jobs/social copies Bluesky's counts here each run.
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS likes    INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS reposts  INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS replies  INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS quotes   INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS stats_at TIMESTAMPTZ;
+
+-- Level 6: AI traffic from our own logs. web/proxy.ts reports each AI-crawler visit and each visit that came from
+-- an AI assistant. Only a count per (kind, name, page, day): no IP address, no user agent, nothing about a person.
+CREATE TABLE IF NOT EXISTS hits (
+    kind  TEXT NOT NULL CHECK (kind IN ('crawler', 'referral')),
+    name  TEXT NOT NULL,                                  -- e.g. 'GPTBot' or 'ChatGPT'
+    path  TEXT NOT NULL,                                  -- the page, e.g. /q/h100-price
+    day   DATE NOT NULL,                                  -- India date
+    count INTEGER NOT NULL DEFAULT 1,
+    PRIMARY KEY (kind, name, path, day)
+);
+
+-- Level 6: CSV exports uploaded by hand (GA4 and Search Console give the user Viewer access, not an API key, and
+-- the Generative AI report has no API at all). Uploading the same file name again replaces the old copy.
+CREATE TABLE IF NOT EXISTS uploads (
+    id          SERIAL PRIMARY KEY,
+    kind        TEXT NOT NULL CHECK (kind IN ('ga4', 'gsc', 'gsc_ai')),
+    filename    TEXT NOT NULL,
+    header      TEXT[] NOT NULL,
+    rows        JSONB NOT NULL,                           -- list of rows, each a list of cells
+    uploaded_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (kind, filename)
+);
+
+-- Level 6: what the AI suggests answering next, and why. A person picks by selecting the question (Level 2's button).
+CREATE TABLE IF NOT EXISTS suggestions (
+    id         SERIAL PRIMARY KEY,
+    insight    TEXT NOT NULL,                             -- what the audience responds to
+    picks      JSONB NOT NULL,                            -- [{"question_id": 12, "reason": "..."}]
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Timeline: the two steps that had no time of their own. Every other step's time is already in its table.
+ALTER TABLE questions ADD COLUMN IF NOT EXISTS selected_at   TIMESTAMPTZ;   -- when you put it on the shortlist
+ALTER TABLE drafts    ADD COLUMN IF NOT EXISTS prechecked_at TIMESTAMPTZ;   -- when the last fact was ticked
