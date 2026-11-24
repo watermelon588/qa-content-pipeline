@@ -39,6 +39,8 @@ _Last updated: 2026-11-24 (session 13)_
 
 - **Expert guide (24 Nov):** `docs/expert-guide/AI-Atlas-India-Expert-Reviewer-Guide.pdf` (12 pages) walks the experts through the email, the code box, reading, checking facts, deciding, and the published page, using real screenshots of the local test copy with sample data (`guide.html` is the source; print it with Chrome's `--print-to-pdf` to rebuild). `1-review-page.png`, `2-decision.png`, `3-published-answer.png` are for attaching to emails. README rewritten. **Committed and pushed** with everything since `ea76adf`.
 
+- **Domain check (24 Nov, 19:55 IST):** `gpu.aiatlasindia.com` still serves Vyohm's own Astro "coming soon" page through Cloudflare (proxied, `noindex`, `/about` 404), not our Vercel app. Ask Vyohm to point the CNAME at Vercel with the Cloudflare proxy OFF (DNS only). Until then the working address is https://atlas-web-gamma-five.vercel.app. On Vercel the `api` project also needs `EXPERT_CODES` and `SITE_URL=https://gpu.aiatlasindia.com` (review links use it), and it hadn't redeployed the new code yet (`/experts` 404) right after the push.
+
 ## Next actions (in order)
 **S13 order (replaces the list below where they differ):**
 0. **User: expert codes.** Send each expert their code from `api/.env` (`EXPERT_CODES`) once, on WhatsApp, not in the review email. Add the same `EXPERT_CODES` line to the Vercel `api` project's environment variables, then redeploy. Without it nobody can open a review link. Confirm Prince's title and his written OK to be named, then update the name in `api/review/experts.py` and `web/lib/site.ts`.
