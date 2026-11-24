@@ -1,59 +1,126 @@
-# AI Atlas India: Content Engine (GPU cloud and AI infrastructure)
+<p align="center">
+  <img src="web/public/favicon.svg" alt="AI Atlas India mark" width="72" height="72">
+</p>
 
-An AI content engine for one section of [AI Atlas India](https://aiatlasindia.com), built for Vyohm AI's
-content-engine assignment. **Live: [gpu.aiatlasindia.com](https://gpu.aiatlasindia.com)**
+<h1 align="center">AI Atlas India · GPU Content Engine</h1>
 
-The engine finds the questions Indian business owners ask about renting GPU and cloud compute, drafts answers from
-provider pages with every fact quoted and sourced, and sends each draft to a real expert. **Nothing is published until
-the expert approves it.** Published answers are shared on Bluesky, replies are drafted for a person to approve, and a
-results screen suggests what to write next.
+<p align="center">
+  <b>AI drafts. A real expert approves. Every fact is sourced and dated.</b><br>
+  An AI content engine for the <i>GPU cloud and AI infrastructure</i> section of
+  <a href="https://aiatlasindia.com">AI Atlas India</a>, built for <b>Vyohm AI</b>.
+</p>
+
+<p align="center">
+  <a href="https://gpu.aiatlasindia.com"><b>Live site</b></a> ·
+  <a href="docs/expert-guide/AI-Atlas-India-Expert-Reviewer-Guide.pdf">Expert guide (PDF)</a> ·
+  <a href="docs/ARCHITECTURE.md">Architecture</a> ·
+  <a href="docs/DECISIONS.md">Decisions</a> ·
+  <a href="https://bsky.app/profile/watermelon588.bsky.social">Bluesky</a>
+</p>
+
+<p align="center">
+  <img alt="Next.js 16" src="https://img.shields.io/badge/Next.js-16-0f1b2d">
+  <img alt="FastAPI" src="https://img.shields.io/badge/FastAPI-Python_3.13-0f1b2d">
+  <img alt="Postgres" src="https://img.shields.io/badge/Neon-Postgres-0f1b2d">
+  <img alt="Bluesky" src="https://img.shields.io/badge/Bluesky-AT_Protocol-0f1b2d">
+  <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-f4c430">
+</p>
+
+---
+
+## Who this is for
+
+**[Vyohm AI](https://aiatlasindia.com)** runs **AI Atlas India**, an independent guide that helps Indian business owners
+choose AI providers. This repo is my entry for Vyohm AI's content-engine assignment: build and run one section of the
+site end to end. The section lives at **[gpu.aiatlasindia.com](https://gpu.aiatlasindia.com)** and answers the real
+questions people ask before they rent or buy GPU compute in India: cost, which provider, which GPU, and where the data stays.
+
+<p align="center">
+  <img src="docs/expert-guide/3-published-answer.png" alt="A published answer, credited to the expert who approved it" width="820">
+  <br><sub>A published answer: AI-assisted, approved by a named expert, every fact linked to its source.</sub>
+</p>
 
 ## How it works
 
-| Step | What happens | Where |
-|---|---|---|
-| 1. Collect | Questions from Stack Exchange and Hacker News (official APIs), at most 20 new per run | `api/questions/` |
-| 2. Rank | The AI scores each question as a buying question, gives a reason, merges duplicates | `api/questions/rank.py` |
-| 3. Draft | The AI writes from 1-4 whole provider pages; every fact must quote its source word for word or the draft is rejected | `api/drafts/` |
-| 4. Pre-check | The admin ticks each fact after opening its source (the link highlights the quote) | `/admin` |
-| 5. Expert review | A one-time link, assigned to one expert, opens only with that expert's personal code. They approve, edit (title, search text, image text, answer) or reject | `api/review/`, `/review/<link>` |
-| 6. Publish | The admin publishes approved answers (hard cap of 20 in code). Each page credits the expert who approved it | `api/pages/`, `/q/<slug>` |
-| 7. Share | Bluesky posts and replies are AI-drafted; a person schedules every post and approves every reply | `api/social/`, `/admin?view=social` |
-| 8. Results | AI-crawler and AI-assistant visits, GA4 and Search Console uploads, and AI suggestions for the next questions | `api/stats/`, `/admin?view=results` |
+```
+collect ─► rank ─► draft ─► check facts ─► expert review ─► publish ─► Bluesky ─► results
+ (APIs)    (AI)    (AI)       (admin)      (code-locked)    (≤ 20)    (human-ok)  (AI suggests)
+```
 
-The AI calls go through one function, `llm()` (`api/core/llm/`), with a fallback across free models on Gemini, Groq and
-OpenRouter. Drafting and ranking use the strongest list (`FALLBACK_BEST`) with JSON mode.
+| Step | What happens |
+|---|---|
+| **Collect** | Questions from Stack Exchange and Hacker News through their official APIs, at most 20 new per run. No scraping. |
+| **Rank** | The AI scores each one as a buying question, explains why, and merges duplicates. |
+| **Draft** | The strongest free models write from whole provider pages. Every fact must quote its source word for word, or the draft is rejected and retried. |
+| **Check facts** | The admin opens each source (the link highlights the quote) and ticks the facts. |
+| **Expert review** | A one-time link, locked to one expert's personal code. They approve, edit (title, search text, image text, answer) or reject. |
+| **Publish** | Only approved answers, hard-capped at 20 in code. Each page names the expert who approved it. |
+| **Bluesky** | The AI drafts posts and replies; a person schedules every post and approves every reply. |
+| **Results** | AI-crawler and AI-assistant visits, GA4 and Search Console uploads, and AI suggestions for what to write next. |
+
+<p align="center">
+  <img src="docs/expert-guide/1-review-page.png" alt="The expert review page" width="49%">
+  <img src="docs/expert-guide/2-decision.png" alt="The expert's decision form" width="49%">
+  <br><sub>The expert's review page: everything that will be published, then approve, edit or reject.</sub>
+</p>
+
+## Rules enforced in code
+- Nothing is published unless an expert approved it; the AI's version and the expert's edits are both kept.
+- At most **20** published answers (`api/pages/pages.py`).
+- Every fact carries its source link, an exact quote and the date it was checked.
+- Bluesky: our own answers only, a person approves every reply, no automated follows, likes or reposts.
+- No secrets, expert contact details or commenter data in the repo.
 
 ## Stack
-- **Web** (`web/`): Next.js 16 (App Router, TypeScript), the public pages, the admin desk and the expert review page. On Vercel.
-- **API** (`api/`): FastAPI on Python 3.13, plain SQL with `psycopg` on Neon Postgres (`api/db/schema.sql`). On Vercel.
-- **Email**: Resend. **Social**: Bluesky (AT Protocol over HTTP). **Scheduler**: GitHub Actions (`.github/workflows/jobs.yml`).
 
-## Run locally
+| Part | Choice | Folder |
+|---|---|---|
+| Public pages, admin desk, expert page | Next.js 16 (App Router, TypeScript) on Vercel | [`web/`](web/) |
+| AI, jobs, integrations | FastAPI, Python 3.13, on Vercel | [`api/`](api/) |
+| Database | Neon Postgres, plain SQL with `psycopg` | [`api/db/schema.sql`](api/db/schema.sql) |
+| LLMs | One `llm()` with fallback across Gemini, Groq and OpenRouter free tiers, JSON mode | [`api/core/llm/`](api/core/llm/) |
+| Email / Social / Scheduler | Resend / Bluesky / GitHub Actions | [`api/review/`](api/review/), [`api/social/`](api/social/), [`.github/workflows/`](.github/workflows/) |
+
+## Run it locally
 ```bash
-npm --prefix web install && npm --prefix web run dev            # http://localhost:3000
+# web: http://localhost:3000
+npm --prefix web install && npm --prefix web run dev
+
+# api: http://localhost:8000/health
 python -m venv api/.venv
 api/.venv/Scripts/python -m pip install -r api/requirements.txt
-api/.venv/Scripts/python -m uvicorn main:app --app-dir api --reload --port 8000   # /health
+api/.venv/Scripts/python -m uvicorn main:app --app-dir api --reload --port 8000
 ```
-Copy `api/.env.example` to `api/.env` and `web/.env.example` to `web/.env.local`, and fill them in. Create the tables
-with `cd api && .venv/Scripts/python -m db.init_db`. To try the whole flow without touching live data, see "Local test
-copy" in `docs/HANDOFF.md`.
+Copy [`api/.env.example`](api/.env.example) to `api/.env` and [`web/.env.example`](web/.env.example) to `web/.env.local`,
+then create the tables: `cd api && .venv/Scripts/python -m db.init_db`. To try the whole flow without touching live
+data, use the local test copy described in [`docs/HANDOFF.md`](docs/HANDOFF.md).
 
-## Tests
+**Tests**
 ```bash
 cd api && .venv/Scripts/python -m unittest tests.test_questions tests.test_drafts tests.test_review tests.test_social tests.test_stats -v
 cd web && node --test lib/session.test.mjs && npm run lint && npm run build
 ```
 
-## Rules enforced in code
-- Only drafts with an expert's `approved` or `edited` decision can be published; the AI's version and the expert's are both kept.
-- At most 20 published answers (`api/pages/pages.py`).
-- Every fact carries its source link, an exact quote and the date it was checked.
-- Bluesky: our own answers only, a person approves every reply, no automated follows, likes or reposts.
-- No secrets, expert contact details or commenter data in the repo.
+## Documentation
 
-## Docs
-- `docs/HANDOFF.md`: current state and next steps. `docs/DECISIONS.md`: every decision and why.
-- `docs/ARCHITECTURE.md`: how the parts fit. `docs/GLOSSARY.md`: the terms used.
-- `docs/expert-guide/`: the guide sent to expert reviewers (PDF and the real screens).
+| Doc | What's in it |
+|---|---|
+| [HANDOFF](docs/HANDOFF.md) | Current state, next steps, and everything that broke and how it was fixed |
+| [PROJECT_CONTEXT](docs/PROJECT_CONTEXT.md) | The assignment, its rules and checkpoints |
+| [ARCHITECTURE](docs/ARCHITECTURE.md) | How the parts fit together |
+| [DECISIONS](docs/DECISIONS.md) | Every design decision and why it was made |
+| [GLOSSARY](docs/GLOSSARY.md) | Plain-English definitions of the terms used |
+| [Expert guide](docs/expert-guide/) | The PDF guide and onboarding emails for the expert reviewers |
+| Prompts | [`rank`](api/questions/prompts/rank.txt), [`draft`](api/drafts/prompts/draft.txt), [`suggest`](api/stats/prompts/suggest.txt) |
+
+## Credits
+- **Built by** [Rohit Maity](https://github.com/watermelon588), for Vyohm AI's content-engine assignment.
+- **Expert reviewers:** Sanath W (Senior DevOps Engineer) and Prince Patel, who approve every published answer.
+- **AI Atlas India** and its design system belong to **Vyohm AI Private Limited**; this section follows their section kit.
+- Questions come from the [Stack Exchange API](https://api.stackexchange.com) and the [Hacker News Algolia API](https://hn.algolia.com/api).
+- Language models by Google Gemini, Groq and OpenRouter (NVIDIA Nemotron and others) on their free tiers.
+- AI coding tools were used while building this; every line was reviewed by the author.
+
+## License
+The code is released under the [MIT License](LICENSE). The AI Atlas India name, logo and design system are Vyohm AI's
+and are not covered by this license. Published answer text belongs to AI Atlas India.
