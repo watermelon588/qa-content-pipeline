@@ -9,6 +9,7 @@ from core.status import check_move
 from drafts.draft import generate, save_draft
 from drafts.sources import gather
 from drafts.timeline import timeline
+from review.experts import EXPERTS
 
 router = APIRouter(dependencies=[Depends(require_secret)])
 
@@ -80,9 +81,12 @@ def get_draft(draft_id: int):
         )
         draft["facts"] = cur.fetchall()
         # Level 4: the expert's latest answer (their edit is the AFTER version) and the page, once published.
-        cur.execute("SELECT decision, edited_body, advice, note, decided_at FROM reviews "
-                    "WHERE draft_id = %s ORDER BY id DESC LIMIT 1", (draft_id,))
+        cur.execute("SELECT decision, edited_body, edited_title, edited_meta_description, edited_alt_text, advice, note, "
+                    "decided_at, expert, opened_at FROM reviews WHERE draft_id = %s ORDER BY id DESC LIMIT 1", (draft_id,))
         draft["review"] = cur.fetchone()
+        if draft["review"]:
+            draft["review"]["expert_name"] = EXPERTS.get(draft["review"]["expert"])  # who the link was sent to
+        draft["experts"] = EXPERTS  # who it can be sent to (the desk's "send to" choice)
         cur.execute("SELECT slug FROM pages WHERE draft_id = %s", (draft_id,))
         page = cur.fetchone()
         draft["slug"] = page["slug"] if page else None

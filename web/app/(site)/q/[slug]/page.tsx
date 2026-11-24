@@ -1,16 +1,15 @@
 // One published answer. Only drafts the expert approved ever reach GET /pages/{slug} (the API joins on their
 // decision), so this page can't show anything unapproved. It says plainly that AI drafted it, lists every
-// source with the date we read it, and credits the expert by name only if they agreed (EXPERT_NAME in lib/site.ts).
+// source with the date we read it, and credits by name the expert who approved this answer (from the API).
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import Markdown from "@/components/Markdown";
 import { api, hostOf, type Page } from "@/lib/api";
-import { EXPERT_NAME, HUB_URL, SECTION_TITLE } from "@/lib/site";
+import { HUB_URL, SECTION_TITLE } from "@/lib/site";
 
 const loadPage = (slug: string) => api<Page>(`/pages/${encodeURIComponent(slug)}`).catch(() => null);
 const day = (iso: string) => new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
-const expert = EXPERT_NAME ?? "our expert reviewer";
 
 export async function generateMetadata({ params }: PageProps<"/q/[slug]">): Promise<Metadata> {
   const page = await loadPage((await params).slug);
@@ -34,6 +33,7 @@ export default function AnswerPage({ params }: PageProps<"/q/[slug]">) {
 async function Answer({ params }: { params: PageProps<"/q/[slug]">["params"] }) {
   const page = await loadPage((await params).slug);
   if (!page) notFound();
+  const expert = page.reviewer ?? "our expert reviewer"; // older links (before expert codes) have no name
 
   return (
     <article>
@@ -46,7 +46,7 @@ async function Answer({ params }: { params: PageProps<"/q/[slug]">["params"] }) 
           <h1 className="h2">{page.title}</h1>
           <p className="answer-marks">
             <span className="badge">AI-assisted draft</span>
-            <span className="badge">Reviewed by {EXPERT_NAME ? "a named expert" : "an expert"}</span>
+            <span className="badge">Reviewed by {page.reviewer ? "a named expert" : "an expert"}</span>
           </p>
           <p className="muted">Published {day(page.published_at)}. Approved by {expert} on {day(page.decided_at)}.</p>
         </div>

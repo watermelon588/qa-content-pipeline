@@ -2,13 +2,14 @@
 The reply is untrusted: parse_draft() rejects anything we can't verify, so a made-up fact never reaches the table."""
 import json
 import re
+import time
 from collections import Counter
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from psycopg.types.json import Jsonb
 
-from core.llm.client import llm
+from core.llm.client import TIME_LIMIT, llm
 
 PROMPT = (Path(__file__).parent / "prompts" / "draft.txt").read_text(encoding="utf-8")
 
@@ -17,15 +18,21 @@ PUBLISHER = {"@type": "Organization", "name": "AI Atlas India", "url": "https://
 MIN_SNIPPET = 10   # a 3-character "quote" would match almost any page
 MAX_SNIPPET = 300
 MAX_CITES = 3      # times one fact may be cited in the body
+TRIES = 3          # drafts per request; each retry is told why the last one was rejected
 
 
 def today_ist():
     return datetime.now(IST).date()
 
 
+# Curly quotes and long dashes count as their plain forms: models often "tidy" them when copying, and the words
+# are still the same.
+_PLAIN = str.maketrans("‘’“”–—", "''\"\"--")
+
+
 def _norm(text):
-    """Squeeze spacing and ignore capitals, so a quote still matches if only line breaks or case differ."""
-    return " ".join(text.split()).lower()
+    """Squeeze spacing, ignore capitals and quote/dash styles, so a quote still matches if only those differ."""
+    return " ".join(text.translate(_PLAIN).split()).lower()
 
 
 def build_prompt(question, sources):
@@ -69,8 +76,11 @@ def parse_draft(raw, sources):
             raise ValueError(f"fact number {n} is used twice")
         if url not in pages:
             raise ValueError(f"fact {n} cites {url!r}, which is not one of the sources")
-        if not claim or not MIN_SNIPPET <= len(snippet) <= MAX_SNIPPET:
-            raise ValueError(f"fact {n} needs a claim and a snippet of {MIN_SNIPPET} to {MAX_SNIPPET} characters")
+        if not claim:
+            raise ValueError(f"fact {n} has no claim")
+        if not MIN_SNIPPET <= len(snippet) <= MAX_SNIPPET:  # say how far off, so the retry can fix exactly this
+            raise ValueError(f"fact {n}'s snippet is {len(snippet)} characters; it must be {MIN_SNIPPET} to {MAX_SNIPPET}. "
+                             "Quote only the shortest exact part of the source that states the fact")
         if _norm(snippet) not in pages[url]:
             raise ValueError(f"fact {n}: the snippet is not word for word in {url}. Copy it exactly from the source")
         numbers.add(n)
@@ -100,13 +110,15 @@ def generate(question, sources):
     Raises ValueError if both tries were rejected, RuntimeError if every model is down."""
     prompt = build_prompt(question, sources)
     feedback = ""
-    for _ in range(2):
+    deadline = time.monotonic() + TIME_LIMIT  # both tries share one time limit, so the request ends before Vercel's
+    for _ in range(TRIES):
         try:
-            return parse_draft(llm(prompt + feedback), sources)
+            return parse_draft(llm(prompt + feedback, json=True, best=True, deadline=deadline), sources)
         except ValueError as e:
             error = str(e)
-            feedback = f"\n\nYOUR PREVIOUS REPLY WAS REJECTED: {error}\nReply again with the corrected JSON object only."
-    raise ValueError(f"the draft was rejected twice, last reason: {error}")
+            feedback = (f"\n\nYOUR PREVIOUS REPLY WAS REJECTED: {error}\nCheck EVERY fact for the same problem, not only "
+                        "the one named. Reply again with the corrected JSON object only.")
+    raise ValueError(f"the draft was rejected {TRIES} times, last reason: {error}")
 
 
 def build_json_ld(draft):

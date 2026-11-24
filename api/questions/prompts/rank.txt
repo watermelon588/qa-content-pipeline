@@ -11,8 +11,8 @@ For every question, decide three things:
 2. reason: one plain sentence of at most 25 words that explains the score.
 3. duplicate_of: if another question in the list asks essentially the same thing, give the id of the better-worded one. Otherwise null. Never point a question at itself.
 
-Reply with a JSON list and nothing else: one object per question, using every id exactly once, in this shape:
-[{"id": 12, "score": 7, "reason": "Asks which GPU size to rent for a workload, a real buying decision.", "duplicate_of": null}]
+Reply with one JSON object and nothing else. Its "ranking" list has one entry per question, using every id exactly once, in this shape:
+{"ranking": [{"id": 12, "score": 7, "reason": "Asks which GPU size to rent for a workload, a real buying decision.", "duplicate_of": null}]}
 
 <questions>
 {questions}

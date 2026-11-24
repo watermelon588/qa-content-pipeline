@@ -32,3 +32,17 @@ FALLBACK_FINAL = [
 
 # Tried top to bottom. If one fails (rate limit, outage), the next one is used.
 FALLBACK = FALLBACK_FINAL if LLM_MODE == "final" else FALLBACK_DEV
+
+# For the two jobs where quality matters most, drafting answers and ranking questions, in every mode.
+# Slower (a draft can take 1-2 minutes) but they read whole provider pages (1M-token context) and reason before
+# writing. Tested on the real draft prompt with two full provider pages (74,000 characters) on 2026-11-24:
+# both Nemotron models returned valid JSON with quotes that matched the pages word for word.
+# Gemini Pro would rank first, but its free tier has no quota (429); put it at the top if billing is turned on.
+FALLBACK_BEST = [
+    ("openrouter", "nvidia/nemotron-3-ultra-550b-a55b:free"),  # largest free model we have; about 40-120 s a draft
+    ("gemini", "gemini-3.8-flash"),                            # strong and fast, but often "overloaded" (503)
+    ("openrouter", "nvidia/nemotron-3.5-super-vl:free"),       # passed the same test, about 2 minutes
+    ("gemini", "gemini-3.5-flash"),
+    ("groq", "openai/gpt-oss-120b"),  # last resort: answers in seconds, but Groq's free plan refuses prompts
+                                      # over ~8,000 tokens, so it only helps when the sources are short
+]

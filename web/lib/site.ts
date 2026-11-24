@@ -16,7 +16,9 @@ export const OWNERSHIP_LINE =
 
 // Who is credited on the About page. null = not confirmed yet, the page says so honestly.
 export const BUILDER_NAME = "Rohit Maity";
-export const EXPERT_NAME: string | null = "Sanath W, Senior DevOps Engineer"; // agreed in writing to be named, 24 Nov 2026
+// The expert reviewers, listed on the About page. Each answer page names the one who approved it, which the API sends
+// (api/review/experts.py holds the same names; change both together). Only names they agreed to have shown.
+export const EXPERTS = ["Sanath W, Senior DevOps Engineer", "Prince Patel"];
 export const BLUESKY_URL: string | null = "https://bsky.app/profile/watermelon588.bsky.social"; // set once the automated account exists
 
 // Links into the shared hub. These pages belong to Vyohm's hub, not to this section.

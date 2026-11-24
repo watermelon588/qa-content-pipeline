@@ -9,12 +9,12 @@ Status: **Levels 1 to 5 built** (see the tables below); metrics and the dashboar
 | `web/app/admin/` | **Admin for Levels 2 to 4, built.** `_lib/api.ts` (types, loaders, `nextStep()`), `_lib/actions.ts` (Server Actions for every button, including send to expert and publish), `_lib/sources.ts` (known provider pages), `_components/` (DraftForm, DraftView with the side panel for facts and next step plus the before/after view, QuestionPanel, SocialView, Problem). One page, `page.tsx`: `/admin` overview, `/admin?q=ID` question, `/admin?draft=ID` draft, `/admin?view=social` Bluesky. Styles in `admin.css` |
 | `web/app/review/` | **Level 4, built.** The expert's page `[token]/page.tsx` (approve / edit / reject), its Server Action `actions.ts`, and `code.ts` (checks the code's shape). No password, no analytics, `noindex`, `no-referrer` |
 | `web/lib/`, `web/components/` | Shared: `lib/api.ts` (the server-side API caller and shared types), `lib/site.ts` (site facts), `components/` (Header, Footer, ActionForm with toasts, Markdown) |
-| `web/proxy.ts` | Password (HTTP Basic Auth) for every `/admin` URL |
+| `web/proxy.ts` | Signed login cookie for every `/admin` URL (no cookie: sent to `/login`); also counts AI crawler and AI-assistant visits |
 
 ## Backend folders (built)
 | Folder | Holds |
 |---|---|
-| `api/core/` | Shared plumbing: `config.py` (env vars), `db.py` (`get_conn()`), `http.py` (`get_json()`), `auth.py` (`require_secret`, the bearer check for `/jobs/*`), `llm/models.py` (providers, dev and final model lists), `llm/client.py` (`llm()`) |
+| `api/core/` | Shared plumbing: `config.py` (env vars), `db.py` (`get_conn()`), `http.py` (`get_json()`), `auth.py` (`require_secret`, the bearer check for `/jobs/*`), `llm/models.py` (providers; dev, final and best model lists), `llm/client.py` (`llm()`, with JSON mode and a 270 s limit) |
 | `api/db/` | `schema.sql` (tables) and `init_db.py` (creates them) |
 | `api/questions/` | **Level 2, built.** `queries.py` (search phrases), `sources/` (one file per source: `stackexchange.py`, `hackernews.py`; `__init__.py` is the registry), `collect.py` (run sources, save new questions), `rank.py` (LLM scores and merges), `prompts/rank.txt` (the exact prompt), `router.py` (`POST /jobs/collect`, `POST /jobs/rank`, `GET /questions`) |
 | `api/drafts/` | **Level 3, built.** `sources.py` (download a page and strip it to text, or accept pasted text), `draft.py` (build the prompt, `parse_draft()` check, one retry, code-built JSON-LD, save), `prompts/draft.txt` (the exact prompt), `router.py` (`POST /questions/{id}/draft`, `GET /drafts`, `GET /drafts/{id}`, `POST /drafts/{id}/precheck`) |

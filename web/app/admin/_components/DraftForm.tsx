@@ -12,7 +12,7 @@ export default function DraftForm({ questionId, again }: { questionId: number; a
       action={createDraft}
       className="df"
       label={again ? "Draft a new version" : "Draft the answer"}
-      pendingLabel="Reading the pages and drafting (about 30 s)…"
+      pendingLabel="Reading the pages and drafting (1 to 4 minutes, keep this tab open)…"
       buttonClassName={again ? "btn" : "btn btn--primary"}
     >
       <input type="hidden" name="question_id" value={questionId} />

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { BLUESKY_URL, BUILDER_NAME, EXPERT_NAME, HUB_URL, OWNERSHIP_LINE, SECTION_NAME } from "@/lib/site";
+import { BLUESKY_URL, BUILDER_NAME, EXPERTS, HUB_URL, OWNERSHIP_LINE, SECTION_NAME } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "About this section",
@@ -37,8 +37,12 @@ export default function About() {
           </p>
 
           <h2>Who reviews it</h2>
-          {EXPERT_NAME ? (
-            <p>Every answer is checked and approved by {EXPERT_NAME}, who has agreed in writing to be named here.</p>
+          {EXPERTS.length > 0 ? (
+            <>
+              <p>Every answer is checked and approved by one of our expert reviewers, who have agreed to be named here:</p>
+              <ul>{EXPERTS.map((name) => <li key={name}>{name}</li>)}</ul>
+              <p>Each answer names the expert who approved it, and the date.</p>
+            </>
           ) : (
             <p>
               Our expert reviewer will be named here, with their credentials and any link they have to a

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Toaster } from "sonner";
+import { logout } from "../login/actions";
 import "./admin.css";
 
 // Admin screens: password-protected by proxy.ts, never indexed, no public header or footer.
@@ -17,6 +18,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Link href="/admin" className="adm-top__desk">Answers</Link>
             <Link href="/admin?view=social" className="adm-top__desk">Bluesky</Link>
             <Link href="/admin?view=results" className="adm-top__desk">Results</Link>
+            <form action={logout}>
+              <button type="submit" className="adm-top__desk adm-top__out">Sign out</button>
+            </form>
           </nav>
         </div>
       </header>

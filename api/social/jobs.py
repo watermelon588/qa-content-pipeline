@@ -13,9 +13,8 @@ from social.write import write_reply
 
 DRAFTS_PER_RUN = 5  # keeps one run inside the free LLM limits; the rest wait for the next run
 
-PAGE_SQL = ("SELECT pg.slug, d.title, d.meta_description, COALESCE(r.edited_body, d.body) AS body "
-            "FROM pages pg JOIN drafts d ON d.id = pg.draft_id "
-            "JOIN reviews r ON r.draft_id = d.id AND r.decision IN ('approved', 'edited') ")
+PAGE_SQL = ("SELECT pg.slug, d.title, d.meta_description, d.body "
+            "FROM pages pg JOIN final_drafts d ON d.id = pg.draft_id ")
 
 
 def send_due_posts(session):
@@ -28,7 +27,7 @@ def send_due_posts(session):
         # so a post can't go out twice.
         with get_conn() as conn, conn.cursor(row_factory=dict_row) as cur:
             cur.execute("SELECT po.text, pg.slug, d.title, d.meta_description FROM posts po "
-                        "JOIN pages pg ON pg.id = po.page_id JOIN drafts d ON d.id = pg.draft_id "
+                        "JOIN pages pg ON pg.id = po.page_id JOIN final_drafts d ON d.id = pg.draft_id "
                         "WHERE po.id = %s AND po.status = 'scheduled' FOR UPDATE OF po SKIP LOCKED", (post_id,))
             row = cur.fetchone()
             if row is None:

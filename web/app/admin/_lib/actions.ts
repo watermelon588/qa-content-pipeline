@@ -82,11 +82,14 @@ export async function precheckDraft(_: Result, form: FormData): Promise<Result> 
 
 export async function sendToExpert(_: Result, form: FormData): Promise<Result> {
   try {
-    const r = await api<{ emailed: boolean; link?: string; error?: string }>(`/drafts/${id(form, "draft_id")}/send`, { method: "POST" });
+    const r = await api<{ emailed: boolean; link?: string; error?: string; expert: string }>(`/drafts/${id(form, "draft_id")}/send`, {
+      method: "POST",
+      body: { expert: String(form.get("expert") || "") }, // the API refuses anyone not in its expert list
+    });
     refresh();
     // The link comes back every time. Only its fingerprint is stored, so this is the one chance to copy it.
-    if (r.emailed) return { ok: true, message: "Review email sent to your inbox. Forward it to the expert, or copy the link below.", link: r.link };
-    return { ok: true, message: r.error || "Link ready. Copy it and send it to the expert yourself.", link: r.link };
+    if (r.emailed) return { ok: true, message: `Review email for ${r.expert} sent to your inbox. Forward it to them, or copy the link below. It opens only with their code.`, link: r.link };
+    return { ok: true, message: r.error || `Link for ${r.expert} ready. Copy it and send it to them. It opens only with their code.`, link: r.link };
   } catch (e) {
     return fail(e);
   }

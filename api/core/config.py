@@ -21,6 +21,8 @@ RESEND_API_KEY = os.getenv("RESEND_API_KEY", "")
 EXPERT_EMAIL = os.getenv("EXPERT_EMAIL", "")  # kept here only: never in the repo (the rules)
 MAIL_FROM = os.getenv("MAIL_FROM", "AI Atlas India <onboarding@resend.dev>")  # Resend's test sender
 SITE_URL = os.getenv("SITE_URL", "http://localhost:3000")  # where the review link and the answer pages live
+# Each expert's personal review code, e.g. "sanath:K7QM4XRT,prince:9WPD3HJA". See review/experts.py.
+EXPERT_CODES = os.getenv("EXPERT_CODES", "")
 
 # Level 5: the Bluesky account. Use an APP password (Settings > Privacy and security > App passwords),
 # never the account's real password: an app password can be revoked on its own.

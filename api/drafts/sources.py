@@ -5,11 +5,12 @@ from html.parser import HTMLParser
 from core.http import get_text
 
 MAX_SOURCES = 4      # pages per draft
-MAX_CHARS = 10_000   # text kept per page
-TOTAL_CHARS = 18_000 # text kept across ALL pages. Groq's free plan refuses a request over 7,000-8,000 tokens,
-                     # and 18,000 characters plus the prompt is about 6,000 tokens, so every model in the list can answer.
-MIN_CHARS = 300      # less than this means we got an empty shell, not the real page
-# ponytail: a long page is cut to its share of TOTAL_CHARS, so a price far down the page is lost. Paste the part you need.
+MAX_CHARS = 60_000    # text kept per page: whole provider pages (Google Cloud's GPU pricing page is ~51,000)
+TOTAL_CHARS = 120_000 # text kept across ALL pages, about 30,000 tokens. Drafts use FALLBACK_BEST, whose main models
+                      # read 1M tokens, so nothing is cut that the facts might need. (Groq, last in that list,
+                      # refuses prompts over ~8,000 tokens, so it only helps with short pages.)
+MIN_CHARS = 300       # less than this means we got an empty shell, not the real page
+# ponytail: a page longer than its share of TOTAL_CHARS is cut at the end. Paste the part you need if that happens.
 # ponytail: any https address is fetched. Fine while only the owner (who holds the secret) can call this.
 
 
@@ -77,5 +78,5 @@ def gather(urls, pasted):
             raise ValueError(f"the pasted text for {page['url']} is empty")
         sources.append({"url": page["url"], "text": text})
 
-    share = min(MAX_CHARS, TOTAL_CHARS // len(sources))  # 1 page: 10,000. 2: 9,000 each. 3: 6,000. 4: 4,500.
+    share = min(MAX_CHARS, TOTAL_CHARS // len(sources))  # 1 or 2 pages: 60,000 each. 3: 40,000. 4: 30,000.
     return [{"url": s["url"], "text": s["text"][:share]} for s in sources]

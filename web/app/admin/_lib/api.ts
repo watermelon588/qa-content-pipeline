@@ -1,7 +1,7 @@
 // The admin desk's data: types, loaders, and the "what to do next" rules. api() itself lives in lib/api.ts.
 import { api } from "@/lib/api";
 
-export { hostOf } from "@/lib/api";
+export { hostOf, quoteLink } from "@/lib/api";
 
 export type Question = {
   id: number;
@@ -32,9 +32,15 @@ export type Fact = {
 export type Review = {
   decision: "approved" | "edited" | "rejected" | null; // null = link sent, no answer yet
   edited_body: string | null;
+  edited_title: string | null; // the expert's AFTER version of each, null = left as the AI wrote it
+  edited_meta_description: string | null;
+  edited_alt_text: string | null;
   advice: string | null;
   note: string | null;
   decided_at: string | null;
+  expert: string | null; // "sanath": the only expert whose code opens this link
+  expert_name: string | null; // their display name
+  opened_at: string | null; // first time they opened it with their code; null = not yet
 };
 
 export type Draft = DraftSummary & {
@@ -48,6 +54,7 @@ export type Draft = DraftSummary & {
   review: Review | null;
   slug: string | null; // set once published
   timeline: { step: string; at: string }[]; // when each step happened, oldest first
+  experts: Record<string, string>; // who it can be sent to: {"sanath": "Sanath W, ..."}
 };
 
 /** Everything the question screens need, in one go. */

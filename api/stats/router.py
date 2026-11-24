@@ -68,7 +68,7 @@ def stats():
         uploads = [{**u, "totals": totals(u["header"], u["rows"]), "row_count": len(u["rows"]), "rows": u["rows"][:SHOW_ROWS]}
                    for u in cur.fetchall()]
         cur.execute("SELECT pg.slug, d.title, po.uri, po.sent_at, po.likes, po.reposts, po.replies, po.quotes, po.stats_at "
-                    "FROM posts po JOIN pages pg ON pg.id = po.page_id JOIN drafts d ON d.id = pg.draft_id "
+                    "FROM posts po JOIN pages pg ON pg.id = po.page_id JOIN final_drafts d ON d.id = pg.draft_id "
                     "WHERE po.status = 'sent' ORDER BY po.likes + po.reposts + po.replies + po.quotes DESC, po.sent_at DESC")
         posts = cur.fetchall()
         published = cur.execute("SELECT count(*) AS n FROM pages").fetchone()["n"]

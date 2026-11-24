@@ -151,3 +151,26 @@ CREATE TABLE IF NOT EXISTS suggestions (
 -- Timeline: the two steps that had no time of their own. Every other step's time is already in its table.
 ALTER TABLE questions ADD COLUMN IF NOT EXISTS selected_at   TIMESTAMPTZ;   -- when you put it on the shortlist
 ALTER TABLE drafts    ADD COLUMN IF NOT EXISTS prechecked_at TIMESTAMPTZ;   -- when the last fact was ticked
+
+-- The expert can now edit the title, the search-result text and the image description too, not only the answer.
+-- Each column holds the expert's AFTER version; NULL means "left as the AI wrote it". The AI's draft stays as BEFORE.
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS edited_title            TEXT;
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS edited_meta_description TEXT;
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS edited_alt_text         TEXT;
+
+-- The version of an answer the public sees: the expert's edit where they made one, else the AI's draft. Only answers
+-- the expert approved or edited appear. Published pages, posts and the dashboard read this instead of `drafts`, so
+-- an edited title or description shows up everywhere without each query repeating the COALESCE.
+CREATE OR REPLACE VIEW final_drafts AS
+SELECT d.id, d.question_id,
+       COALESCE(r.edited_title, d.title)                       AS title,
+       COALESCE(r.edited_meta_description, d.meta_description) AS meta_description,
+       COALESCE(r.edited_alt_text, d.alt_text)                 AS alt_text,
+       COALESCE(r.edited_body, d.body)                         AS body,
+       d.json_ld
+FROM drafts d JOIN reviews r ON r.draft_id = d.id AND r.decision IN ('approved', 'edited');
+
+-- Expert codes (review/experts.py): each link is assigned to one expert when it is sent ("sanath", "prince") and
+-- opens only with that expert's personal code. opened_at = the first time they opened it with their code.
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS expert    TEXT;
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS opened_at TIMESTAMPTZ;

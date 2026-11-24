@@ -15,6 +15,10 @@ import ResultsView from "./_components/ResultsView";
 import SocialView from "./_components/SocialView";
 import { hostOf, loadDraft, loadPipeline, loadSocial, loadStats, nextStep, one, scoreText, stageOf, STEPS, TARGET, type Pipeline } from "./_lib/api";
 
+// The buttons on this page (Server Actions) wait for the API: a draft from the strong models takes 1-4 minutes and
+// ranking up to 4.5. Vercel's limit on the free plan is 300 s; the API gives up at 270 s so its error still arrives.
+export const maxDuration = 300;
+
 export default function AdminPage({ searchParams }: PageProps<"/admin">) {
   return (
     // Cache Components: live data must sit inside Suspense (docs: 01-getting-started/08-caching.md)
@@ -100,7 +104,7 @@ function Overview({ data }: { data: Pipeline }) {
             </div>
             <div className="ov-jobs">
               <ActionForm action={collectQuestions} label="Collect new questions" pendingLabel="Collecting…" buttonClassName={job("collect")} />
-              <ActionForm action={rankQuestions} label="Rank unscored" pendingLabel="Ranking…" buttonClassName={job("rank")} />
+              <ActionForm action={rankQuestions} label="Rank unscored" pendingLabel="Ranking (1 to 2 minutes)…" buttonClassName={job("rank")} />
             </div>
           </div>
         </div>

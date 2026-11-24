@@ -47,7 +47,7 @@ def draft_post(slug: str):
     """The AI writes a post for one of OUR published answers (the only thing we post about)."""
     with get_conn() as conn, conn.cursor(row_factory=dict_row) as cur:
         cur.execute("SELECT pg.id, d.title, d.meta_description, r.advice, po.status FROM pages pg "
-                    "JOIN drafts d ON d.id = pg.draft_id "
+                    "JOIN final_drafts d ON d.id = pg.draft_id "
                     "JOIN reviews r ON r.draft_id = d.id AND r.decision IN ('approved', 'edited') "
                     "LEFT JOIN posts po ON po.page_id = pg.id WHERE pg.slug = %s", (slug,))
         page = cur.fetchone()
@@ -106,7 +106,7 @@ def run_social():
 def social_overview():
     with get_conn() as conn, conn.cursor(row_factory=dict_row) as cur:
         cur.execute("SELECT pg.slug, d.title, po.id AS post_id, po.text, po.status, po.send_at, po.uri, po.error, "
-                    "po.sent_at FROM pages pg JOIN drafts d ON d.id = pg.draft_id "
+                    "po.sent_at FROM pages pg JOIN final_drafts d ON d.id = pg.draft_id "
                     "LEFT JOIN posts po ON po.page_id = pg.id ORDER BY pg.published_at DESC")
         posts = cur.fetchall()
         cur.execute("SELECT id, their_uri, their_text, reason, draft, final_text, decision, status, our_uri, created_at "

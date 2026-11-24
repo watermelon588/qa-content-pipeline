@@ -20,10 +20,10 @@ def _lines(rows, empty):
 
 def gather(conn):
     """Everything the prompt needs, as text, plus the ids the AI is allowed to pick."""
-    published = [t for (t,) in conn.execute("SELECT d.title FROM pages p JOIN drafts d ON d.id = p.draft_id")]
+    published = [t for (t,) in conn.execute("SELECT d.title FROM pages p JOIN final_drafts d ON d.id = p.draft_id")]
     posts = [f"- {t}: {likes}, {reposts}, {replies}, {quotes}" for t, likes, reposts, replies, quotes in conn.execute(
         "SELECT d.title, po.likes, po.reposts, po.replies, po.quotes FROM posts po JOIN pages pg ON pg.id = po.page_id "
-        "JOIN drafts d ON d.id = pg.draft_id WHERE po.status = 'sent'")]
+        "JOIN final_drafts d ON d.id = pg.draft_id WHERE po.status = 'sent'")]
     traffic = [f"- {path}: {n} {kind} visits" for path, kind, n in conn.execute(
         "SELECT path, kind, sum(count) FROM hits WHERE day > current_date - 30 GROUP BY path, kind ORDER BY 3 DESC LIMIT 15")]
     exports = [f"{kind} / {name}:\n" + "\n".join(",".join(r) for r in [header] + rows[:EXPORT_ROWS])

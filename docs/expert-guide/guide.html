@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Expert Reviewer Guide · AI Atlas India · GPU cloud and AI infrastructure</title>
+<style>
+  @page { size: A4; margin: 16mm 16mm 18mm; }
+  :root { --ink: #0f1b2d; --paper: #fff; --sea: #e3edf3; --signal: #f4c430; --muted: #43536b; --rule: #c9d3df; }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { margin: 0; color: var(--ink); font: 400 10.5pt/1.55 "Segoe UI", -apple-system, Roboto, Arial, sans-serif; }
+  h1, h2, h3 { font-family: "Segoe UI", Arial, sans-serif; letter-spacing: -0.01em; margin: 0; }
+  .mono { font-family: Consolas, "Cascadia Mono", ui-monospace, monospace; letter-spacing: 0.08em; text-transform: uppercase; font-size: 8pt; }
+  p { margin: 0 0 8px; }
+  ul, ol { margin: 0 0 8px; padding-left: 18px; }
+  li { margin: 0 0 4px; }
+  a { color: var(--ink); }
+
+  /* cover */
+  .cover { height: 263mm; display: flex; flex-direction: column; page-break-after: always; }
+  .cover__band { background: var(--ink); color: #fff; padding: 22mm 14mm 16mm; }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo__mark { width: 30px; height: 30px; background: var(--signal); color: var(--ink); display: grid; place-items: center; font-weight: 800; font-size: 16pt; }
+  .logo__name { font-weight: 700; font-size: 16pt; }
+  .cover__kicker { color: var(--signal); margin-top: 14mm; }
+  .cover h1 { font-size: 32pt; line-height: 1.05; margin-top: 4mm; }
+  .cover__lede { font-size: 12.5pt; color: #d8e1ec; margin-top: 6mm; max-width: 150mm; }
+  .cover__body { padding: 10mm 14mm 0; flex: 1; }
+  .facts { display: grid; grid-template-columns: repeat(3, 1fr); border: 1.5px solid var(--ink); }
+  .facts div { padding: 5mm; border-right: 1.5px solid var(--ink); }
+  .facts div:last-child { border-right: 0; }
+  .facts b { display: block; font-size: 17pt; line-height: 1.1; margin: 2mm 0 1mm; }
+  .cover__foot { padding: 0 14mm; color: var(--muted); font-size: 9pt; }
+
+  /* sections */
+  .section { page-break-before: always; }
+  .section:first-of-type { page-break-before: auto; }
+  .kicker { color: var(--muted); margin-bottom: 2mm; }
+  h2 { font-size: 19pt; line-height: 1.15; margin-bottom: 4mm; padding-bottom: 3mm; border-bottom: 2px solid var(--ink); }
+  h3 { font-size: 12pt; margin: 5mm 0 2mm; }
+  .step { display: grid; grid-template-columns: 12mm 1fr; gap: 3mm; margin-bottom: 3mm; }
+  .step__n { font-weight: 800; font-size: 14pt; line-height: 1.2; }
+  .callout { border: 1.5px solid var(--ink); border-left: 6px solid var(--signal); padding: 3mm 4mm; margin: 4mm 0; background: #fffdf3; }
+  .callout p:last-child, .callout ul:last-child { margin-bottom: 0; }
+  figure { margin: 4mm 0 0; }
+  figure img { width: 100%; display: block; border: 1.5px solid var(--ink); }
+  figure.narrow img { width: 100%; }
+  figcaption { color: var(--muted); font-size: 8.5pt; margin-top: 1.5mm; }
+  .two { display: grid; grid-template-columns: 1fr 1.15fr; gap: 6mm; }
+  table { width: 100%; border-collapse: collapse; margin: 2mm 0 4mm; }
+  th, td { text-align: left; vertical-align: top; padding: 2mm 3mm; border-bottom: 1px solid var(--rule); }
+  th { font-family: Consolas, ui-monospace, monospace; font-size: 8pt; letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 1.5px solid var(--ink); }
+  .avoid { page-break-inside: avoid; }
+</style>
+</head>
+<body>
+
+<!-- Cover -->
+<div class="cover">
+  <div class="cover__band">
+    <div class="logo"><div class="logo__mark">A</div><div class="logo__name">AI Atlas India</div></div>
+    <p class="mono cover__kicker">GPU cloud &amp; AI infrastructure · Expert reviewer guide</p>
+    <h1>How reviewing an answer works</h1>
+    <p class="cover__lede">A short, step-by-step guide to the review page you will use. Every screen in this guide is the real
+      review page, shown with sample data.</p>
+  </div>
+  <div class="cover__body">
+    <div class="facts">
+      <div><span class="mono">Per answer</span><b>~10 minutes</b>Read, check the facts, decide.</div>
+      <div><span class="mono">Your share</span><b>6–7 answers</b>About one a day, by email.</div>
+      <div><span class="mono">Finish by</span><b>1 December</b>Missing a day is fine.</div>
+    </div>
+
+    <h3>What this is</h3>
+    <p>AI Atlas India (<a href="https://aiatlasindia.com">aiatlasindia.com</a>) is an independent guide that helps Indian
+      business owners choose AI providers. Our section, <b>GPU cloud and AI infrastructure</b>, lives at
+      <a href="https://gpu.aiatlasindia.com">gpu.aiatlasindia.com</a> and answers the real questions people ask before they rent
+      or buy GPU compute.</p>
+    <p>An AI writes the first draft of each answer, using only the provider pages we give it, and every fact links to the
+      exact quote it came from. <b>Nothing is published until a real expert approves it. That expert is you.</b></p>
+
+    <h3>Your role in one line</h3>
+    <p>Read the answer, check that it is correct and useful, then approve it, approve it with your edits, or reject it.
+      Your name appears on every answer you approve.</p>
+  </div>
+  <p class="cover__foot">AI Atlas India is owned and run by Vyohm AI Private Limited. This section was built by Rohit Maity for
+    Vyohm AI's content-engine assignment.</p>
+</div>
+
+<!-- Overview -->
+<div class="section">
+  <p class="mono kicker">Overview</p>
+  <h2>The whole flow, in six steps</h2>
+  <div class="step"><div class="step__n">01</div><div><b>You get an email</b> with one answer to review and a yellow “Review the answer” button.</div></div>
+  <div class="step"><div class="step__n">02</div><div><b>You type your personal reviewer code</b> the first time. Your browser remembers it after that.</div></div>
+  <div class="step"><div class="step__n">03</div><div><b>You read everything that will be published</b>: the title, the line shown in search results, the image description and the answer.</div></div>
+  <div class="step"><div class="step__n">04</div><div><b>You check the facts.</b> Each fact sits next to the quote it came from, with a link that opens the provider's page.</div></div>
+  <div class="step"><div class="step__n">05</div><div><b>You decide</b>: approve, approve with your edits, or reject, and optionally add 2–3 lines of your own advice.</div></div>
+  <div class="step"><div class="step__n">06</div><div><b>Done.</b> We publish the approved answer on the live site with your name, and share it on our Bluesky account.</div></div>
+
+  <div class="callout avoid">
+    <p class="mono">The pace</p>
+    <ul>
+      <li>We send <b>one answer at a time, about one a day</b>, so you never face a pile.</li>
+      <li>You will get <b>6–7 answers in total</b>, depending on the day.</li>
+      <li>Busy one day? No problem. Each link stays valid for <b>14 days</b>. Anything finished by <b>1 December</b> is perfect.</li>
+      <li>Tell us the time of day that suits you, and we will send the emails then.</li>
+    </ul>
+  </div>
+
+  <h3>What makes a good review</h3>
+  <table class="avoid">
+    <tr><th style="width:32%">Check</th><th>What to look for</th></tr>
+    <tr><td>Correct</td><td>Does each claim say what its quote says? Is anything out of date, misleading or missing an important caveat?</td></tr>
+    <tr><td>Useful</td><td>Would an Indian business owner or a small tech team actually be helped by this answer?</td></tr>
+    <tr><td>Fair</td><td>No provider is favoured without a reason. Vyohm's own products get no special treatment.</td></tr>
+    <tr><td>Clear</td><td>Plain words, a title that says what the page answers, a sensible search-result line.</td></tr>
+    <tr><td>Your experience</td><td>The 2–3 lines of advice are the most valuable part: what you have seen work (or fail) in practice.</td></tr>
+  </table>
+</div>
+
+<!-- Step 1 -->
+<div class="section">
+  <p class="mono kicker">Step 01</p>
+  <h2>The email</h2>
+  <div class="two">
+    <div>
+      <ul>
+        <li>Each email carries <b>one answer</b>. The title is shown in the yellow-edged box.</li>
+        <li>Press <b>Review the answer</b>. If the button doesn't work, the plain link is at the bottom of the email.</li>
+        <li>The link is <b>for you only</b>. It opens only with your reviewer code, works once, and expires after 14 days.</li>
+        <li>The email also lists a few questions we would value your view on. They are suggestions for your advice, not homework.</li>
+        <li>The email comes from Rohit, our admin. Reply to it if anything is unclear.</li>
+      </ul>
+    </div>
+    <figure class="narrow" style="margin-top:0"><img src="01-email.png" alt="The review email"><figcaption>The review email (sample answer).</figcaption></figure>
+  </div>
+</div>
+
+<!-- Step 2 -->
+<div class="section">
+  <p class="mono kicker">Step 02</p>
+  <h2>Your reviewer code (once per browser)</h2>
+  <ul>
+    <li>The first time you open a link, the page asks for your <b>personal reviewer code</b>. Nothing of the answer is shown until then.</li>
+    <li>We send your code <b>separately, on WhatsApp</b>, never in the review email. Capitals, spaces and dashes don't matter.</li>
+    <li>Your browser then remembers the code for 30 days, so the next links open straight away.</li>
+    <li>The code simply confirms it is really you. Every decision is saved under your name, and a link sent to you cannot be opened with anyone else's code.</li>
+    <li>Please keep the code to yourself. On a shared computer, the page offers “Forget the saved code”.</li>
+  </ul>
+  <figure><img src="02-code.png" alt="The reviewer code box"><figcaption>First visit: type your code and press “Open the answer” (the code shown is a dummy).</figcaption></figure>
+</div>
+
+<!-- Step 3 -->
+<div class="section">
+  <p class="mono kicker">Step 03</p>
+  <h2>Read everything that will be published</h2>
+  <ul>
+    <li>The top of the page shows the answer's title and confirms the link is for you.</li>
+    <li><b>Everything that will be published</b> lists the page title, the search-result text (the sentence Google and AI assistants show under the title) and the image description (alt text).</li>
+    <li>Below that is <b>the answer</b> exactly as readers will see it. Numbers like <b>[3]</b> point to the facts further down.</li>
+  </ul>
+  <figure><img src="1-review-page.png" alt="Top of the review page"><figcaption>The top of the review page.</figcaption></figure>
+  <figure><img src="04-answer.png" alt="The answer"><figcaption>The answer, as it will be published.</figcaption></figure>
+</div>
+
+<!-- Step 4 -->
+<div class="section">
+  <p class="mono kicker">Step 04</p>
+  <h2>Check the facts</h2>
+  <ul>
+    <li>Every fact shows three things: the <b>claim</b> (in our words), the <b>quote</b> copied word for word from the provider's page, and a link.</li>
+    <li><b>Show the quote</b> opens the provider's page with the quote highlighted in yellow. If nothing is highlighted, press <b>Ctrl+F</b> (Cmd+F on a Mac) and search a few words of the quote.</li>
+    <li>Ask yourself: does the claim say the same as the quote? Is it still true? Is anything important left out?</li>
+    <li>A computer has already checked that every quote really is on the page. What we need from you is the expert judgement: is the claim right, fair and meaningful?</li>
+    <li>You don't have to open every link. Spot-checking the facts that matter most (prices, limits, data location) is fine.</li>
+  </ul>
+  <figure><img src="05-facts.png" alt="Facts with quotes"><figcaption>Each fact beside its quote and its source.</figcaption></figure>
+</div>
+
+<!-- Step 5 -->
+<div class="section">
+  <p class="mono kicker">Step 05</p>
+  <h2>Your decision</h2>
+  <table class="avoid">
+    <tr><th style="width:30%">Choose</th><th>When, and what happens</th></tr>
+    <tr><td><b>Approve as written</b></td><td>It is correct and useful as it is. It goes to the admin to publish.</td></tr>
+    <tr><td><b>Approve with my edits</b></td><td>Mostly right, but you want to change something. Editable boxes open for the title, the search-result text, the image description and the answer. Only what you change is saved, and the AI's version is kept for the record.</td></tr>
+    <tr><td><b>Reject</b></td><td>Wrong, misleading or not useful. Write one or two lines on why; we write a new version from better sources and may send it to you again.</td></tr>
+  </table>
+  <ul>
+    <li><b>Your advice for readers</b> (optional, 2–3 lines) is published on the page under your name. First-hand experience is what makes these pages worth reading.</li>
+    <li>When editing the answer, keep the [1], [2] markers next to facts you keep; delete a marker together with its fact.</li>
+    <li>Press <b>Send my decision</b>. The decision is final for that link. If you change your mind, just reply to the email.</li>
+  </ul>
+  <figure><img src="2-decision.png" alt="Decision form with edits open"><figcaption>“Approve with my edits” opens every published field for editing.</figcaption></figure>
+</div>
+
+<!-- Step 6 -->
+<div class="section">
+  <p class="mono kicker">Step 06</p>
+  <h2>Done, and what happens next</h2>
+  <ul>
+    <li>You see a short thank-you, and you can close the page. That's all for this answer.</li>
+    <li>Rohit (the admin) then <b>publishes the approved answer</b> on <a href="https://gpu.aiatlasindia.com">gpu.aiatlasindia.com</a>.</li>
+    <li>The page shows <b>“Reviewed by a named expert”</b> and “Approved by <i>your name</i>” with the date, plus your advice if you wrote some.</li>
+    <li>The answer is then shared on the section's <b>Bluesky</b> account as a short post linking to the page. It is our own account, labelled as automated, and every post and reply is checked by a person first.</li>
+  </ul>
+  <figure><img src="07-thanks.png" alt="Thank-you page" style="max-height:95mm; object-fit:cover; object-position:top"><figcaption>After you send your decision.</figcaption></figure>
+  <figure><img src="3-published-answer.png" alt="The published answer"><figcaption>The published answer credits the expert who approved it (sample: Sanath W).</figcaption></figure>
+</div>
+
+<!-- Public page + FAQ -->
+<div class="section">
+  <p class="mono kicker">On the live site</p>
+  <h2>Every fact stays sourced and dated</h2>
+  <figure><img src="09-public-sources.png" alt="Sources on the published page"><figcaption>The published page lists every source with the date it was checked, and says how the page was made.</figcaption></figure>
+
+  <h3>Good to know</h3>
+  <ul>
+    <li><b>Live site:</b> <a href="https://gpu.aiatlasindia.com">gpu.aiatlasindia.com</a>. It starts empty: answers appear only after you approve them.</li>
+    <li><b>Link expired or lost?</b> Reply to the email and we will send a fresh one (it cancels the old one).</li>
+    <li><b>Missed a day?</b> That's fine. Each link waits 14 days; please finish everything by <b>1 December</b>.</li>
+    <li><b>Something looks wrong on the page?</b> Reject with a short note, or reply to the email.</li>
+    <li><b>Your details:</b> only your name and title appear on the site. Your email address and phone number are never published or stored in our code.</li>
+  </ul>
+  <div class="callout avoid">
+    <p><b>Thank you.</b> Your review is what turns an AI draft into something a business owner can trust.</p>
+  </div>
+</div>
+
+</body>
+</html>

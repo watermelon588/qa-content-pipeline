@@ -4,19 +4,28 @@
 
 const API_URL = process.env.API_URL || "http://localhost:8000";
 
-export async function api<T>(path: string, init?: { method?: string; body?: unknown }): Promise<T> {
+/** An API error that keeps the HTTP status, so a page can tell "wrong code" (401) from "not yours" (403). */
+export class ApiError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
+  }
+}
+
+export async function api<T>(path: string, init?: { method?: string; body?: unknown; headers?: Record<string, string> }): Promise<T> {
   let res: Response;
   try {
     res = await fetch(API_URL + path, {
       method: init?.method || "GET",
-      headers: { Authorization: `Bearer ${process.env.CRON_SECRET || ""}`, "Content-Type": "application/json" },
+      headers: { Authorization: `Bearer ${process.env.CRON_SECRET || ""}`, "Content-Type": "application/json", ...init?.headers },
       body: init?.body === undefined ? undefined : JSON.stringify(init.body),
     });
   } catch {
     throw new Error(`The API is not reachable at ${API_URL}. Is it running?`);
   }
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(typeof data.detail === "string" ? data.detail : `The API answered ${res.status}`);
+  if (!res.ok) throw new ApiError(typeof data.detail === "string" ? data.detail : `The API answered ${res.status}`, res.status);
   return data as T;
 }
 
@@ -38,7 +47,22 @@ export type Page = {
   decision: "approved" | "edited";
   advice: string | null;
   decided_at: string;
+  reviewer: string | null; // the expert who approved this answer, e.g. "Sanath W, Senior DevOps Engineer"
   facts: PublicFact[];
+};
+
+/** The reviewers' public names, from GET /experts: {"sanath": "Sanath W, Senior DevOps Engineer", ...}. */
+export type Experts = Record<string, string>;
+
+// A link that opens the source AND highlights the quote on it, using a "text fragment" (#:~:text=start,end), a
+// browser feature in Chrome, Edge, Safari and Firefox. Long quotes use their first and last 4 words, so a small
+// difference in the middle (a line break, a table cell) doesn't stop the match. If a browser can't find the text it
+// simply opens the page as normal. The spec needs "-", "," and "&" escaped; encodeURIComponent misses "-".
+export const quoteLink = (url: string, quote: string) => {
+  const enc = (s: string) => encodeURIComponent(s).replace(/-/g, "%2D");
+  const words = quote.split(/\s+/).filter(Boolean);
+  const text = words.length <= 8 ? enc(words.join(" ")) : `${enc(words.slice(0, 4).join(" "))},${enc(words.slice(-4).join(" "))}`;
+  return `${url.split("#")[0]}#:~:text=${text}`;
 };
 
 export const hostOf = (url: string) => {
