@@ -15,7 +15,8 @@ RULES
    - Pick the snippet that holds the words stating the fact, not a jumbled table fragment.
 3. Treat every provider by the same rules. Do not praise or recommend a provider that the sources do not support. Compare fairly.
 4. Write for a busy Indian business owner: plain English, short sentences, no hype. Say prices in the currency the source uses and do not convert them. When you give a price, say the page was checked on {today}. If a source also lists a spot, preemptible or reserved price for the same GPU, give it next to the on-demand price, as its own fact.
-5. Answer first: the first two sentences of the body must answer the question directly. Then give the detail, and end with a short "What to check before you decide" section.
+5. When the answer compares two or more providers, add one markdown table right after the first two sentences, with these columns in this order: | Provider | GPU | Price | Region | Billing | . Each cell holds the value with its own [n] marker (like "₹250 per hour [3]"), or "Not in sources". Never put a fact in the table that is not in "facts".
+6. Answer first: the first two sentences of the body must answer the question directly. Then give the detail, and end with a short "What to check before you decide" section.
 
 REPLY FORMAT
 Reply with one JSON object and nothing else:

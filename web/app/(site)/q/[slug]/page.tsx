@@ -82,7 +82,8 @@ async function Answer({ params }: { params: PageProps<"/q/[slug]">["params"] }) 
         <p className="answer-how muted">
           How this page was made: AI wrote the first draft using only the sources above. A person checked every
           fact against its source, then {expert} reviewed and approved the answer. Prices and features change, so
-          check the provider before you buy. Spotted a mistake? <a href={`${HUB_URL}/contact/`}>Tell us</a>.
+          check the provider before you buy. Compare every provider in the{" "}
+          <a href={`${HUB_URL}/providers/`}>AI Atlas India provider index</a>. Spotted a mistake? <a href={`${HUB_URL}/contact/`}>Tell us</a>.
         </p>
       </div>
     </article>
