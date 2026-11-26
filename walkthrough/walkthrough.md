@@ -1,4 +1,4 @@
-# Demo video walkthrough: Part 1 (question → draft)
+# Demo video walkthrough: Parts 1–2 (question → draft → sent to the expert)
 
 Your script for recording. Each scene has: **Screen** (where you are), **Do** (what to click), **Say** (read it aloud), **You should see** (what to expect), and a screenshot.
 
@@ -14,7 +14,7 @@ Your script for recording. Each scene has: **Screen** (where you are), **Do** (w
 | Part | Covers | Time |
 |---|---|---|
 | **1 (this file)** | Intro, collect, rank, pick, draft | **~1:50** |
-| 2 | Check facts, send to expert | ~0:45 |
+| **2 (this file)** | Check facts, send to expert | **~0:45** |
 | 3 | Expert's review page, approve or edit | ~0:50 |
 | 4 | Publish, public answer page | ~0:50 |
 | 5 | Bluesky post, wrap-up (what broke, what's next) | ~0:45 |
@@ -128,7 +128,7 @@ Ranking takes 1 to 2 minutes and drafting takes 1 to 4. **Cut those waits in edi
 
 ![Draft form with provider pages](screens/07-draft-form.png)
 
-> ⚠ **If drafting fails** (a red message like *"the draft was rejected 3 times, last reason: fact 7: the snippet is not word for word…"*): this happened twice in my test run on 26 Nov. Just click **Draft the answer** again, or tick a different page. Cut the failed attempt from the video, or keep 5 seconds of it and say: *"Here my code caught the AI misquoting its source and refused the draft. That's the check working."* It's a good "what broke" moment for the write-up.
+> ⚠ **If drafting fails** (a red message like *"the draft was rejected 2 time(s), last reason: …"*): since the 26 Nov fix (D31) this should be rare. A misquoted fact is now dropped with the sentence that used it, instead of failing the whole draft, and the request always ends in time with a message instead of a blank "failed to load". If it still happens, click **Draft the answer** again, or tick fewer pages. Cut the failed attempt, or keep 5 seconds and say: *"Here my code caught the AI misquoting its sources and refused the draft. That's the check working."*
 >
 > **Tip:** do one practice draft on a different question before recording, so you know how long it takes today.
 
@@ -142,7 +142,7 @@ Ranking takes 1 to 2 minutes and drafting takes 1 to 4. **Cut those waits in edi
 
 **Say:**
 > "Here's the draft: a title, the text Google will show, and the answer, with a numbered marker on every fact.
-> On the right is every fact with its source link, the exact quote and the date it was checked. My code rejects any fact whose quote isn't word for word on the page, and the AI gets up to three tries to fix it.
+> On the right is every fact with its source link, the exact quote and the date it was checked. If a quote isn't word for word on that page, my code deletes the fact and every sentence that used it, so nothing unsourced survives.
 > But a quote existing doesn't prove it supports the sentence, so next I check each fact myself before the expert sees it."
 
 **You should see:** On the left, **Draft v1 · DRAFT**, the title, the search-result text, the image alt text, a **Timeline (India time)** box (question collected → selected → draft written), then the answer. On the right, the **Facts** panel showing "0 of N checked", and for each fact: the claim, the exact quote, "Show the quote on …" with the date read, and a **The source says this** tick box. Below them is the yellow **Save ticked facts** button.
@@ -153,4 +153,92 @@ Ranking takes 1 to 2 minutes and drafting takes 1 to 4. **Cut those waits in edi
 
 ---
 
-**End of Part 1.** Stop here. Tell me when it's recorded and I'll write Part 2 (check facts → send to the expert).
+**End of Part 1.**
+
+---
+
+# Part 2: check the facts, send to the expert (1:50 – 2:35)
+
+Picks up on the draft screen where Scene 6 ended. Nothing has been ticked yet.
+
+> The screenshots below come from the local test copy (test draft 8, a Google Cloud draft with 8 facts). Your title and facts will differ; the buttons and messages are the same.
+
+### Extra privacy rules for this part
+
+- [ ] **Don't open your Gmail.** On the live site, "Send" emails the review link to *your* inbox for forwarding. Never show the inbox or the email in the video.
+- [ ] **Never show an expert's personal code.** The code isn't on this screen, so just don't type it or paste it anywhere while recording.
+- [ ] **The one-time link appears on screen after sending.** It's useless without the expert's code, but don't zoom in on it or leave it on screen for long. Blur it in editing if you can.
+- [ ] Showing the expert's **name and title** is fine: it's already on the About page and on every answer they approve. Their email and phone are not.
+
+---
+
+## Scene 7: Check one fact against its source (1:50 – 2:10)
+
+**Screen:** Draft screen, `/admin?draft=<id>`, the **Facts** panel on the right.
+
+**Do:**
+1. Point at the hint at the top of the panel.
+2. On fact **[1]**, read the claim aloud, then click **Show the quote on cloud.google.com ↗** (the host will match your fact's source).
+3. A new tab opens on the provider's page with the quote **highlighted in yellow**. Hold it there for 2 seconds.
+4. Go back to the desk tab and tick **The source says this** under fact [1].
+
+**Say:**
+> "Before any expert sees it, I check every fact myself. This claim says [read claim 1].
+> I click 'Show the quote', and the provider's own page opens with that exact sentence highlighted. It says the same thing, so I tick it."
+
+**You should see:** "0 of N checked" at the top. Each fact has its claim in bold, the quote in a grey box, the link with "read <date>", and a **The source says this** box. After ticking, the box turns yellow.
+
+![Facts panel before checking](screens/10-facts-unchecked.png)
+
+> **If nothing is highlighted** on the provider's page (some browsers or pages don't support it): press **Ctrl+F** and type a few words of the quote. If it's genuinely not there, leave that fact unticked (see the box after Scene 8).
+
+---
+
+## Scene 8: Tick the rest and save (2:10 – 2:20)
+
+**Screen:** Same Facts panel.
+
+**Do:** **Before recording,** check every other fact the same way. Then, on camera, tick the remaining boxes and click the yellow **Save ticked facts** at the bottom of the panel.
+
+**Say:**
+> "I've checked the other facts the same way. I tick them and save.
+> Only when every single fact is ticked does the draft move on. One unticked fact and it stays here."
+
+**You should see:** Every box yellow before you save. After saving, a green message: **"Every fact checked. The draft is pre-checked."** The badge at the top changes from **DRAFT** to a yellow **PRECHECKED**, each fact now says **CHECKED**, the counter says "N of N checked", and the timeline gets a new line, **"Every fact checked"**.
+
+![All facts ticked, before saving](screens/11-facts-ticked.png)
+
+> **Honesty note:** don't tick a fact on camera that you haven't actually checked. "I checked the rest off camera" is fine, as long as it's true.
+>
+> **If a fact is wrong** (the quote isn't on the page, or it doesn't say what the claim says): leave it unticked and click Save. The message says `Saved. 1 fact still to check.` and the draft can't go to the expert. Go **← Back to the question** and click **Draft a new version**, perhaps with different pages. That's a good honest moment to show if it happens.
+
+---
+
+## Scene 9: Send it to the expert (2:20 – 2:35)
+
+**Screen:** Same draft screen. The top of the Facts panel now shows a **NEXT STEP** box.
+
+**Do:** In **Send to**, choose the expert (Sanath W or Prince Patel). Click **Send to the expert**. The button says "Sending…" for a second or two.
+
+**Say:**
+> "Now it goes to a real expert. I pick who reviews it. The link only opens with that expert's personal code, so a forwarded email is useless to anyone else, and every decision is recorded under their name.
+> Nothing gets published without their approval. My code enforces that, it's not just a promise."
+
+**You should see:** Before clicking, the box says *"Every fact is checked. Choose the expert: the link opens only with their personal code."*
+
+![Pre-checked draft with the Send to box](screens/12-prechecked.png)
+
+After clicking:
+- A green message: **"Review email for Sanath W, Senior DevOps Engineer sent to your inbox. Forward it to them, or copy the link below. It opens only with their code."** (The screenshot shows the wording from the test copy, where email is turned off.)
+- The badge changes to **IN REVIEW**.
+- The box changes to **WAITING FOR THE EXPERT**: *"… has a one-time link (it expires in 14 days). They haven't opened it yet."*
+- Below it: **Send this one-time link to the expert** with the link. Don't linger on it (see the privacy rules).
+- The timeline adds **"Sent for review to <expert>"**.
+
+![Sent: waiting for the expert](screens/13-sent.png)
+
+**After you stop recording:** forward the email from your inbox to the expert you chose (off camera). Their personal code was sent to them separately before, so don't send it again in the same email. Part 3 starts when they open the link.
+
+---
+
+**End of Part 2** (video so far: about 2:35). Tell me when it's recorded and I'll write Part 3 (the expert's review page: approve, edit or reject).
