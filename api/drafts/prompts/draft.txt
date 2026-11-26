@@ -31,4 +31,4 @@ Reply with one JSON object and nothing else:
   "expert_questions": ["two or three questions for a practising cloud or GPU engineer whose first-hand experience would make this page better than a summary, for example what surprised them or what to watch out for; do not ask about prices"]
 }
 
-The snippet is checked by a program: if it is not in the source exactly as you wrote it, the whole draft is rejected. Copy it character for character.
+The snippet is checked by a program: if it is not in the source exactly as you wrote it, the fact AND every sentence or table row citing it are deleted from your answer. Copy it character for character, and cite the page it is actually on.

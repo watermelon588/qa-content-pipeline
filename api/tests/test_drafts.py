@@ -15,6 +15,10 @@ SOURCES = [{"url": PAGE, "text": "Plans. NVIDIA H100 80GB GPU: Rs 250 per hour, 
 BODY = "An H100 costs Rs 250 per hour [1]. Your data stays in Mumbai [2]. " + "Compare providers carefully before you buy. " * 6
 
 
+def reply_facts():
+    return json.loads(reply().strip("`json\n"))["facts"]
+
+
 def reply(**changes):
     """A good LLM reply as text, with any field changed."""
     data = {
@@ -43,42 +47,63 @@ class ParseDraftTest(unittest.TestCase):
         result = draft.parse_draft(reply(facts=facts, body=BODY.replace("[2]", "[1]")), SOURCES)
         self.assertEqual(len(result["facts"]), 1)
 
-    def test_snippet_not_in_the_source_is_rejected(self):
-        facts = [{"n": 1, "claim": "c", "source_url": PAGE, "snippet": "NVIDIA H100 80GB GPU: Rs 99 per hour"}]
-        with self.assertRaisesRegex(ValueError, "not word for word"):
-            draft.parse_draft(reply(facts=facts, body=BODY.replace("[2]", "[1]")), SOURCES)
+    # A fact we can't verify is dropped together with every sentence citing it; the rest of the draft survives.
+    # The bug this guards: one 432-character snippet used to fail the whole draft three times over (26 Nov).
+    def assert_fact_2_dropped(self, bad_fact):
+        facts = [reply_facts()[0], {"n": 2, "claim": "c", **bad_fact}]
+        result = draft.parse_draft(reply(facts=facts), SOURCES)
+        self.assertEqual([f["n"] for f in result["facts"]], [1])
+        self.assertNotIn("Mumbai", result["body"])  # the sentence that cited fact 2 is gone
+        self.assertIn("Rs 250 per hour [1]", result["body"])
 
-    def test_fact_citing_an_unknown_source_is_rejected(self):
-        facts = [{"n": 1, "claim": "c", "source_url": "https://other.example/x", "snippet": "NVIDIA H100 80GB GPU: Rs 250"}]
-        with self.assertRaisesRegex(ValueError, "not one of the sources"):
+    def test_snippet_not_in_the_source_is_dropped(self):
+        self.assert_fact_2_dropped({"source_url": PAGE, "snippet": "Data stays in Delhi only."})
+
+    def test_fact_citing_an_unknown_source_is_dropped(self):
+        self.assert_fact_2_dropped({"source_url": "https://other.example/x", "snippet": "Data stays in Mumbai."})
+
+    def test_too_short_or_too_long_snippet_is_dropped(self):
+        self.assert_fact_2_dropped({"source_url": PAGE, "snippet": "Mumbai"})
+        self.assert_fact_2_dropped({"source_url": PAGE, "snippet": "Data stays in Mumbai. " * 30})
+
+    def test_quote_with_dropped_punctuation_or_skipped_text_still_matches(self):
+        for snippet in ("NVIDIA H100 80GB GPU Rs 250 per hour", "NVIDIA H100 80GB GPU ... billed per second"):
+            facts = [{"n": 1, "claim": "c", "source_url": PAGE, "snippet": snippet}]
+            result = draft.parse_draft(reply(facts=facts, body=BODY.replace("[2]", "[1]")), SOURCES)
+            self.assertEqual(len(result["facts"]), 1, snippet)
+
+    def test_body_marker_without_a_fact_loses_its_sentence(self):
+        result = draft.parse_draft(reply(body=BODY + " Also cheap [7]."), SOURCES)
+        self.assertNotIn("[7]", result["body"])
+
+    def test_table_row_citing_a_dropped_fact_is_removed(self):
+        body = BODY + "\n\n| GPU | Price |\n|---|---|\n| H100 | Rs 250 [1] |\n| A100 | Rs 9 [9] |"
+        result = draft.parse_draft(reply(body=body), SOURCES)
+        self.assertIn("| H100 | Rs 250 [1] |", result["body"])
+        self.assertNotIn("A100", result["body"])
+
+    def test_all_facts_bad_is_rejected(self):
+        facts = [{"n": 1, "claim": "c", "source_url": PAGE, "snippet": "made up words here"}]
+        with self.assertRaisesRegex(ValueError, "backed by a checked fact"):
             draft.parse_draft(reply(facts=facts), SOURCES)
 
     def test_curly_quotes_and_dashes_still_match(self):
         self.assertEqual(draft._norm("It’s “₹249” – per hour"), draft._norm("it's \"₹249\" - per  hour"))
 
-    def test_tiny_snippet_is_rejected(self):
-        facts = [{"n": 1, "claim": "c", "source_url": PAGE, "snippet": "Rs"}]
-        with self.assertRaisesRegex(ValueError, "snippet is 2 characters"):  # the retry is told how far off it was
-            draft.parse_draft(reply(facts=facts), SOURCES)
-
-    def test_body_marker_without_a_fact_is_rejected(self):
-        with self.assertRaisesRegex(ValueError, "no facts with those numbers"):
-            draft.parse_draft(reply(body=BODY + " Also [7]."), SOURCES)
-
     def test_body_with_no_markers_is_rejected(self):
-        with self.assertRaisesRegex(ValueError, "must cite"):
+        with self.assertRaisesRegex(ValueError, "backed by a checked fact"):
             draft.parse_draft(reply(body="No markers at all. " * 20), SOURCES)
 
     def test_one_fact_cited_for_many_claims_is_rejected(self):
         with self.assertRaisesRegex(ValueError, "cited more than 3 times"):
             draft.parse_draft(reply(body=BODY + " Billing is per second [1]. Taxes are extra [1]. Plans exist [1]."), SOURCES)
 
-    def test_duplicate_fact_number_is_rejected(self):
+    def test_duplicate_fact_number_keeps_the_first(self):
         one = reply()
         data = json.loads(one.strip("`json\n"))
         data["facts"][1]["n"] = 1
-        with self.assertRaisesRegex(ValueError, "used twice"):
-            draft.parse_draft(json.dumps(data), SOURCES)
+        result = draft.parse_draft(json.dumps(data), SOURCES)
+        self.assertEqual([f["snippet"] for f in result["facts"]], ["NVIDIA H100 80GB GPU: Rs 250 per hour"])
 
     def test_fact_the_body_never_cites_is_dropped(self):
         result = draft.parse_draft(reply(body=BODY.replace("[2]", "[1]")), SOURCES)
@@ -100,6 +125,13 @@ class ParseDraftTest(unittest.TestCase):
 
 
 class GenerateTest(unittest.TestCase):
+    def test_no_retry_when_time_is_nearly_up(self):
+        # The bug this guards: retries ran past Vercel's 300 s, which kills the request with no error on screen.
+        with patch.object(draft, "llm", return_value=reply(title="")) as fake:
+            with self.assertRaisesRegex(ValueError, "rejected 1 time"):
+                draft.generate("Q?", SOURCES, deadline=draft.time.monotonic() + 30)
+        self.assertEqual(fake.call_count, 1)
+
     def test_retries_once_with_the_reason_then_succeeds(self):
         bad = reply(title="")
         with patch.object(draft, "llm", side_effect=[bad, reply()]) as fake:
@@ -109,7 +141,7 @@ class GenerateTest(unittest.TestCase):
 
     def test_gives_up_after_three_rejections(self):
         with patch.object(draft, "llm", return_value=reply(title="")) as fake:
-            with self.assertRaisesRegex(ValueError, "rejected 3 times"):
+            with self.assertRaisesRegex(ValueError, "rejected 3 time"):
                 draft.generate("Q?", SOURCES)
         self.assertEqual(fake.call_count, 3)
         self.assertTrue(all(c.kwargs["json"] and c.kwargs["best"] for c in fake.call_args_list))  # strong models, JSON mode

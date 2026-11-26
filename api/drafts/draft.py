@@ -9,30 +9,36 @@ from pathlib import Path
 
 from psycopg.types.json import Jsonb
 
-from core.llm.client import TIME_LIMIT, llm
+from core.llm.client import llm
 
 PROMPT = (Path(__file__).parent / "prompts" / "draft.txt").read_text(encoding="utf-8")
 
 IST = timezone(timedelta(hours=5, minutes=30))  # India has no daylight saving, so a fixed offset is exact
 PUBLISHER = {"@type": "Organization", "name": "AI Atlas India", "url": "https://aiatlasindia.com"}
 MIN_SNIPPET = 10   # a 3-character "quote" would match almost any page
-MAX_SNIPPET = 300
+MAX_SNIPPET = 500  # the prompt asks for at most 300; real quotes often run longer, and they're still exact
 MAX_CITES = 3      # times one fact may be cited in the body
 TRIES = 3          # drafts per request; each retry is told why the last one was rejected
+BUDGET = 240       # seconds for the WHOLE draft request (downloads + every try). Vercel kills a request at 300 s with
+                   # no error message, so we stop well before and answer with a real reason instead.
+MIN_TRY = 60       # seconds a retry needs; with less left we stop and say why the last try failed
 
 
 def today_ist():
     return datetime.now(IST).date()
 
 
-# Curly quotes and long dashes count as their plain forms: models often "tidy" them when copying, and the words
-# are still the same.
-_PLAIN = str.maketrans("‘’“”–—", "''\"\"--")
-
-
 def _norm(text):
-    """Squeeze spacing, ignore capitals and quote/dash styles, so a quote still matches if only those differ."""
-    return " ".join(text.translate(_PLAIN).split()).lower()
+    """The words of the text only: lower case, no punctuation or spacing. Models often "tidy" a quote when copying
+    it (curly quotes, dashes, a dropped bracket) and the words are still the same, so those must still match."""
+    return " ".join(re.findall(r"[\w₹$%]+", text.lower()))
+
+
+def _quoted(snippet, page):
+    """True if the page holds this quote word for word. A quote may skip text with "..." if every piece is there.
+    (A right quote under the WRONG link stays false: the body's claim then names the wrong provider.)"""
+    pieces = [p for p in (_norm(part) for part in re.split(r"\.\.\.|…", snippet)) if p]
+    return bool(pieces) and all(p in page for p in pieces)
 
 
 def build_prompt(question, sources):
@@ -67,31 +73,25 @@ def parse_draft(raw, sources):
     pages = {s["url"]: _norm(s["text"]) for s in sources}
     facts, numbers = [], set()
     for item in data.get("facts") if isinstance(data.get("facts"), list) else []:
+        # A fact we can't verify is DROPPED (with every sentence that cites it, below) instead of failing the
+        # whole draft: one over-long quote used to throw away an otherwise good answer and cost minutes per retry.
         try:
             n = int(item["n"])
             claim, url, snippet = (str(item[k]).strip() for k in ("claim", "source_url", "snippet"))
         except (KeyError, TypeError, ValueError):
-            raise ValueError("every fact needs n, claim, source_url and snippet") from None
-        if n in numbers:
-            raise ValueError(f"fact number {n} is used twice")
-        if url not in pages:
-            raise ValueError(f"fact {n} cites {url!r}, which is not one of the sources")
-        if not claim:
-            raise ValueError(f"fact {n} has no claim")
-        if not MIN_SNIPPET <= len(snippet) <= MAX_SNIPPET:  # say how far off, so the retry can fix exactly this
-            raise ValueError(f"fact {n}'s snippet is {len(snippet)} characters; it must be {MIN_SNIPPET} to {MAX_SNIPPET}. "
-                             "Quote only the shortest exact part of the source that states the fact")
-        if _norm(snippet) not in pages[url]:
-            raise ValueError(f"fact {n}: the snippet is not word for word in {url}. Copy it exactly from the source")
+            continue
+        if (n in numbers or url not in pages or not claim or not MIN_SNIPPET <= len(snippet) <= MAX_SNIPPET
+                or not _quoted(snippet, pages[url])):
+            continue
         numbers.add(n)
         facts.append({"n": n, "claim": claim, "source_url": url, "snippet": snippet})
 
+    draft["body"] = drop_unsourced(draft["body"], numbers)
     counts = Counter(int(m) for m in re.findall(r"\[(\d+)\]", draft["body"]))
     cited = set(counts)
-    if not cited:
-        raise ValueError("the body must cite its facts with markers like [1]")
-    if cited - numbers:
-        raise ValueError(f"the body cites {sorted(cited - numbers)} but there are no facts with those numbers")
+    if not cited or len(draft["body"]) < 200:
+        raise ValueError("too little of the body is backed by a checked fact. Cite facts with markers like [1], and "
+                         f"copy each snippet word for word from its source ({MIN_SNIPPET} to {MAX_SNIPPET} characters)")
     # One quote can't back many different claims (code can't judge meaning, so it limits how far one fact stretches).
     overused = sorted(n for n, times in counts.items() if times > MAX_CITES)
     if overused:
@@ -105,20 +105,40 @@ def parse_draft(raw, sources):
     return draft
 
 
-def generate(question, sources):
-    """Draft, check, and (once) retry with the reason if the check failed. Returns the clean draft dict.
-    Raises ValueError if both tries were rejected, RuntimeError if every model is down."""
+def drop_unsourced(body, good):
+    """Remove every sentence (or table row) that cites a fact number not in `good`, so no claim is left without
+    a checked source. Lines with no marker are kept as they are."""
+    def bad(text):
+        return any(int(n) not in good for n in re.findall(r"\[(\d+)\]", text))
+
+    lines = []
+    for line in body.split("\n"):
+        if line.lstrip().startswith("|"):  # a table row: keep or drop it whole
+            kept = "" if bad(line) else line
+        else:
+            kept = " ".join(s for s in re.split(r"(?<=[.!?])\s+", line) if not bad(s))
+        if kept.strip() or not line.strip():  # a line emptied by the cut goes; blank lines stay
+            lines.append(kept)
+    return "\n".join(lines).strip()
+
+
+def generate(question, sources, deadline=None):
+    """Draft, check, and retry with the reason if the check failed. Returns the clean draft dict.
+    deadline: time.monotonic() value the whole request must end by (the router starts it before downloading).
+    Raises ValueError if every try was rejected, RuntimeError if every model is down."""
     prompt = build_prompt(question, sources)
     feedback = ""
-    deadline = time.monotonic() + TIME_LIMIT  # both tries share one time limit, so the request ends before Vercel's
-    for _ in range(TRIES):
+    deadline = deadline or time.monotonic() + BUDGET
+    tries = 0
+    while tries < TRIES and (not tries or deadline - time.monotonic() >= MIN_TRY):  # no time left: stop and say why
+        tries += 1
         try:
             return parse_draft(llm(prompt + feedback, json=True, best=True, deadline=deadline), sources)
         except ValueError as e:
             error = str(e)
             feedback = (f"\n\nYOUR PREVIOUS REPLY WAS REJECTED: {error}\nCheck EVERY fact for the same problem, not only "
                         "the one named. Reply again with the corrected JSON object only.")
-    raise ValueError(f"the draft was rejected {TRIES} times, last reason: {error}")
+    raise ValueError(f"the draft was rejected {tries} time(s), last reason: {error}. Try again, or pick fewer pages")
 
 
 def build_json_ld(draft):

@@ -1,5 +1,6 @@
 """Get the provider pages we will draw facts from, as plain text.
 You supply the addresses (or paste the text of pages we can't download). The AI sees only this text."""
+from concurrent.futures import ThreadPoolExecutor
 from html.parser import HTMLParser
 
 from core.http import get_text
@@ -70,7 +71,9 @@ def gather(urls, pasted):
     if len(set(all_urls)) != len(all_urls):
         raise ValueError("each source address may appear only once")
 
-    sources = [{"url": url, "text": fetch_text(url)} for url in urls]
+    with ThreadPoolExecutor() as pool:  # download all pages at once: 4 slow pages take 20 s, not 80 s
+        texts = list(pool.map(fetch_text, urls))
+    sources = [{"url": url, "text": text} for url, text in zip(urls, texts)]
     for page in pasted:
         _check_https(page["url"])
         text = " ".join(page["text"].split())[:MAX_CHARS]

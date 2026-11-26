@@ -1,4 +1,6 @@
 """The web addresses (endpoints) of the drafts feature. Same secret as the questions routes."""
+import time
+
 from fastapi import APIRouter, Depends, HTTPException
 from psycopg.rows import dict_row
 from pydantic import BaseModel
@@ -6,7 +8,7 @@ from pydantic import BaseModel
 from core.auth import require_secret
 from core.db import get_conn
 from core.status import check_move
-from drafts.draft import generate, save_draft
+from drafts.draft import BUDGET, generate, save_draft
 from drafts.sources import gather
 from drafts.timeline import timeline
 from review.experts import EXPERTS
@@ -39,9 +41,10 @@ def create_draft(question_id: int, request: DraftRequest):
     check_move("question", status, "drafted")  # refuses a question nobody has selected
 
     # The slow part (downloads and LLM calls) runs with no database connection held open.
+    deadline = time.monotonic() + BUDGET  # starts BEFORE the downloads, so the whole request beats Vercel's 300 s
     try:
         sources = gather(request.source_urls, [p.model_dump() for p in request.source_texts])
-        draft = generate(text, sources)
+        draft = generate(text, sources, deadline)
     except ValueError as e:      # a bad address, an empty page, or a draft we could not verify
         raise HTTPException(status_code=422, detail=str(e)) from e
     except RuntimeError as e:    # every LLM failed, twice. The full list of errors goes to the server log only:
