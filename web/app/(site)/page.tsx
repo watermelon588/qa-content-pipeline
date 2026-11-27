@@ -2,8 +2,11 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
+import AnswerList from "@/components/AnswerList";
+import { previewOf, type AnswerCard } from "@/lib/answers";
 import { api, type Page } from "@/lib/api";
 import { HUB_URL, SECTION_LEDE, SECTION_NAME, SECTION_TITLE, SITE_NAME, SITE_URL } from "@/lib/site";
+import { providerOf } from "@/lib/sources";
 
 // Describes the site to search engines and AI answer engines. Static, so it is safe to inline.
 const jsonLd = {
@@ -24,9 +27,36 @@ const STEPS = [
   { title: "We publish and re-check", meta: "Both bylines, the sources and the review date." },
 ];
 
+type Listed = Pick<Page, "slug" | "title" | "meta_description">;
+
+const day = (iso: string) => new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
+const count = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
+
+// The list endpoint has only titles, so each answer is loaded too, for its opening lines, reviewer and sources.
+// ponytail: one request per answer, all at once. Fine because publishing stops at 20; add the fields to
+// GET /pages if the page ever feels slow. If one fails, that answer still shows with its search description.
+async function toCard(listed: Listed): Promise<AnswerCard> {
+  const page = await api<Page>(`/pages/${encodeURIComponent(listed.slug)}`).catch(() => null);
+  const fallback = { slug: listed.slug, title: listed.title, preview: listed.meta_description, trust: "", providers: [] };
+  if (!page) return fallback;
+  const checked = page.facts.map((f) => f.checked_on).sort().at(-1);
+  const trust = [
+    `Approved by ${page.reviewer ?? "our expert reviewer"}`,
+    count(page.facts.length, "cited fact"),
+    count(new Set(page.facts.map((f) => f.source_url)).size, "source page"),
+    ...(checked ? [`checked ${day(checked)}`] : []),
+  ].join(" · ");
+  return {
+    ...fallback,
+    preview: previewOf(page.body) || listed.meta_description,
+    trust,
+    providers: [...new Set(page.facts.map((f) => providerOf(f.source_url)))],
+  };
+}
+
 // The published answers, newest first. If the API is down, the page still renders with the empty message.
 async function Answers() {
-  const pages = await api<Pick<Page, "slug" | "title" | "meta_description">[]>("/pages").catch(() => []);
+  const pages = await api<Listed[]>("/pages").catch(() => []);
   if (pages.length === 0) {
     return (
       <div className="empty">
@@ -35,19 +65,7 @@ async function Answers() {
       </div>
     );
   }
-  return (
-    <ol className="entry-list">
-      {pages.map((p, i) => (
-        <li key={p.slug}>
-          <span className="entry-list__n">{String(i + 1).padStart(2, "0")}</span>
-          <div>
-            <Link className="entry-list__title" href={`/q/${p.slug}`}>{p.title}</Link>
-            <p className="entry-list__meta">{p.meta_description}</p>
-          </div>
-        </li>
-      ))}
-    </ol>
-  );
+  return <AnswerList cards={await Promise.all(pages.map(toCard))} />;
 }
 
 export default function Home() {

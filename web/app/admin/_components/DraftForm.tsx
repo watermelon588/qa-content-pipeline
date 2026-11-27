@@ -1,7 +1,7 @@
 // The "draft an answer" form: tick known provider pages, type other addresses, or paste a page's text.
 
 import { createDraft } from "../_lib/actions";
-import { KNOWN_SOURCES } from "../_lib/sources";
+import { KNOWN_SOURCES, SOURCE_GROUPS } from "@/lib/sources";
 import { hostOf } from "../_lib/api";
 import ActionForm from "@/components/ActionForm";
 
@@ -17,22 +17,27 @@ export default function DraftForm({ questionId, again }: { questionId: number; a
     >
       <input type="hidden" name="question_id" value={questionId} />
 
-      <fieldset className="df-group">
-        <legend className="df-label">Provider pages (pick 1 to 4)</legend>
-        <ul className="df-sources">
-          {KNOWN_SOURCES.map((s) => (
-            <li key={s.url}>
-              <label className="df-source">
-                <input type="checkbox" name="source" value={s.url} />
-                <span>
-                  <strong>{s.provider}</strong> {s.page}
-                  <small>{hostOf(s.url)}</small>
-                </span>
-              </label>
-            </li>
-          ))}
-        </ul>
-      </fieldset>
+      <p className="df-help">
+        Pick 1 to 4 pages in total. To compare providers, pick pages from at least two of them.
+      </p>
+      {SOURCE_GROUPS.map((group) => (
+        <fieldset key={group.key} className="df-group">
+          <legend className="df-label">{group.label}</legend>
+          <ul className="df-sources">
+            {KNOWN_SOURCES.filter((s) => s.group === group.key).map((s) => (
+              <li key={s.url}>
+                <label className="df-source">
+                  <input type="checkbox" name="source" value={s.url} />
+                  <span>
+                    <strong>{s.provider}</strong> {s.page}
+                    <small>{hostOf(s.url)}</small>
+                  </span>
+                </label>
+              </li>
+            ))}
+          </ul>
+        </fieldset>
+      ))}
 
       <details className="df-more">
         <summary>Use another page</summary>
