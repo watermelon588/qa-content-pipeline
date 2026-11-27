@@ -1,4 +1,4 @@
-# Demo video walkthrough: Parts 1–2 (question → draft → sent to the expert)
+# Demo video walkthrough: Parts 1–4 (question → draft → expert check → published page → Bluesky)
 
 Your script for recording. Each scene has: **Screen** (where you are), **Do** (what to click), **Say** (read it aloud), **You should see** (what to expect), and a screenshot.
 
@@ -15,9 +15,26 @@ Your script for recording. Each scene has: **Screen** (where you are), **Do** (w
 |---|---|---|
 | **1 (this file)** | Intro, collect, rank, pick, draft | **~1:50** |
 | **2 (this file)** | Check facts, send to expert | **~0:45** |
-| 3 | Expert's review page, approve or edit | ~0:50 |
-| 4 | Publish, public answer page | ~0:50 |
-| 5 | Bluesky post, wrap-up (what broke, what's next) | ~0:45 |
+| **3 (this file)** | Expert's decision, publish, public page | **~1:10** |
+| **4 (this file)** | Bluesky post, what broke, what's next | **~1:10** |
+
+The plan ends at **4:55**. **It only fits if you use the short lines below.** With the original lines, the whole script is 729 spoken words, about 4:52 of talking at a normal pace, which leaves no time for clicks.
+
+### Short lines for Parts 1–2 (use these)
+
+These replace the **Say** text of five scenes. Nothing else changes.
+
+| Scene | Say this instead |
+|---|---|
+| 0 | Hi, I'm Rohit. I built a content engine for AI Atlas India's GPU and cloud section. AI drafts the answers, and a real expert approves each one. Here's one, start to finish. |
+| 1 | This is my answer desk. The yellow box is always the next step. |
+| 3 | The AI scores each question for buying intent, gives a reason, and merges duplicates. I still judge them myself. |
+| 6 | Every fact has a source, an exact quote and a date. If a quote isn't on the page, my code removes the fact and the sentences using it. But a real quote may not support the claim, so I check each one. |
+| 9 | Now a real expert. The link opens only with their personal code, and nothing publishes without their approval. |
+
+With these, the script is about 3:45 of talking, leaving about 70 seconds for clicks and pauses.
+
+**Already recorded Parts 1–2 with the long lines?** They should end by about **2:40**. If they run longer, re-record those five scenes, or speed the footage up to 1.1x and check that your voice still sounds natural.
 
 Ranking takes 1 to 2 minutes and drafting takes 1 to 4. **Cut those waits in editing** (or pause recording and resume). Never leave a spinner on screen for more than a second or two.
 
@@ -237,8 +254,213 @@ After clicking:
 
 ![Sent: waiting for the expert](screens/13-sent.png)
 
-**After you stop recording:** forward the email from your inbox to the expert you chose (off camera). Their personal code was sent to them separately before, so don't send it again in the same email. Part 3 starts when they open the link.
+**After you stop recording:** forward the email from your inbox to the expert you chose (off camera). Their personal code was sent to them separately before, so don't send it again in the same email. Part 3 starts after they send their decision.
 
 ---
 
-**End of Part 2** (video so far: about 2:35). Tell me when it's recorded and I'll write Part 3 (the expert's review page: approve, edit or reject).
+**End of Part 2** (video so far: about 2:35). Record Part 3 only after the expert has answered.
+
+---
+
+# Part 3: expert check → published page (2:35 – 3:45)
+
+**Use the same answer as Parts 1 and 2.** The video has to follow one answer all the way through.
+
+> The screenshots in Parts 3 and 4 come from the local test copy (test draft 8). The advice in them is marked **SAMPLE** because no expert wrote it. Your live screens will show your expert's real words.
+
+### Rules for this part (breaking the first two could disqualify you)
+
+- [ ] **Never open the expert's live review link, and never decide for them.** If you open it with their code, the timeline records that *they* opened it, which would be false. If you approve it, that is a fake expert review.
+- [ ] **Publish only after the real expert has approved.** There is no unpublish button.
+- [ ] **For the expert's own screen, use the two sample images** (`screens/15-expert-page.png` and `screens/16-expert-decision.png`) as still pictures in your video editor. Put this caption on both: **"Sample from my local test copy. Only the expert opens the real link."** If the expert offers to record their own screen, that is even better: they start *after* the code box, with no email or code visible.
+- [ ] The expert must have agreed **in writing** to be named. If Prince reviews, confirm the title and written OK first.
+- [ ] Ask the expert to add **2 to 3 lines of their own advice**. It is what a generic AI summary doesn't have, and it appears on the public page. Never write it for them.
+
+---
+
+## Scene 10: What the expert sees (2:35 – 2:55)
+
+**Screen:** Two still images, each with the caption from the rules above.
+
+**Do:** Show `15-expert-page.png` for about 8 seconds, then `16-expert-decision.png`.
+
+**Say:**
+> "The expert's link opens only with their personal code. They see everything that will go live, including every fact and its quote.
+> Then they approve, edit or reject, and can add advice. These are sample screens from my test copy, because only the expert opens the real link."
+
+![What the expert sees](screens/15-expert-page.png)
+
+![The expert's decision box](screens/16-expert-decision.png)
+
+---
+
+## Scene 11: The real decision, on the live desk (2:55 – 3:10)
+
+**Screen:** Your real draft, `/admin?draft=<id>` (sign in before recording, then reload the page).
+
+**Do:** Point at the expert's answer box, then at the **Timeline (India time)** box.
+
+**Say** (if approved as written):
+> "Back on my desk, this is the real decision: approved. The timeline shows when I sent it, when the expert opened it, and when they decided."
+
+**Say instead** (if approved with edits), and click **Show the AI draft before the expert's edits**:
+> "This is the real decision: edited. I keep both the expert's version, which gets published, and the AI's draft from before."
+
+**You should see:** The badge says **APPROVED** or **EDITED**. A box headed with the expert's name and the date shows the decision and their advice. For edits, each changed title or search text has "AI draft: …" under it. The timeline ends with their decision. The right side has a **NEXT STEP** box with a yellow **Publish** button.
+
+![Approved, ready to publish](screens/17-approved.png)
+
+> **If they rejected it:** the box says "Rejected" with their reason, and the button is **Write a new version**. Draft again, check the facts and send again. Publish nothing for this question until a version is approved. In the video you can then say: *"The expert rejected my first version, and this is the second."*
+>
+> An edited answer makes the better demo because it shows before and after. But never ask the expert to edit just for the camera.
+
+---
+
+## Scene 12: Publish (3:10 – 3:20)
+
+**Screen:** Same draft screen.
+
+**Do:** Click **Publish**.
+
+**Say:**
+> "Now I publish. The server only accepts answers the expert approved, and it caps the site at twenty."
+
+**You should see:** A message `Published at /q/<address>`. The badge changes to **PUBLISHED**, the box says **LIVE** with **Open the page ↗**, and the timeline adds **Published**.
+
+![Published](screens/18-published.png)
+
+---
+
+## Scene 13: The public page (3:20 – 3:32)
+
+**Screen:** The live answer, `https://gpu.aiatlasindia.com/q/<address>`
+
+**Do:** Click **Open the page ↗**. Hold on the top of the page.
+
+**Say:**
+> "Here's the live page. It says AI drafted it, and names the expert who approved it."
+
+**You should see:** The ownership strip and the **GPU** header, the badges **AI-ASSISTED DRAFT** and **REVIEWED BY A NAMED EXPERT**, then "Published <date>. Approved by <expert> on <date>."
+
+![Public answer page](screens/19-public-page.png)
+
+---
+
+## Scene 14: Advice, sources and footer (3:32 – 3:45)
+
+**Screen:** Same public page.
+
+**Do:** Scroll down: the expert's advice box, **Sources**, the "How this page was made" note, then the footer.
+
+**Say:**
+> "It carries the expert's advice, every source with the date checked, and who owns the site."
+
+**You should see:** "From <expert>" with their advice (only if they gave some; if not, leave "the expert's advice" out of your line). A numbered source list with "checked <date>". The footer with the ownership line.
+
+![Advice and sources](screens/20-public-sources.png)
+
+**End of Part 3.**
+
+---
+
+# Part 4: post to Bluesky and wrap up (3:45 – 4:55)
+
+### Check these before recording (off camera)
+
+This will be the **first real post** from the engine. Until now, sending was only tested with a fake Bluesky.
+
+- [ ] The Bluesky screen does **not** say "Bluesky isn't connected yet". If it does, add `BLUESKY_HANDLE` and `BLUESKY_APP_PASSWORD` to the Vercel `api` project and redeploy.
+- [ ] **The post's card must link to the real site.** The one-time link you got in Scene 9 must start with `https://gpu.aiatlasindia.com/`, because the card uses the same `SITE_URL` setting. If it starts with anything else, fix `SITE_URL` on Vercel and redeploy **before** posting.
+- [ ] **See whether the scheduler is on.** On GitHub, open Actions → **jobs** → the newest run. The "Bluesky" step should be green. Grey means skipped: add the `API_URL` and `CRON_SECRET` repository secrets. Vyohm's Level 5 asks for posts to go out on their own, so turn it on.
+- [ ] Have your Bluesky profile ready in a **logged-out private window**: https://bsky.app/profile/watermelon588.bsky.social. That keeps your notifications and other accounts off screen. On 27 Nov it showed "AI Atlas India · GPU (automated)", the bot label and 0 posts. The bio starts "it is an automated account…", so change it to "This is an automated account…".
+
+---
+
+## Scene 15: The AI writes the post (3:45 – 4:00)
+
+**Screen:** `/admin?view=social` (click **Bluesky** in the desk's top bar)
+
+**Do:** Scroll to **Posts**. Under your answer, click **Write a post**. **Cut the wait.** Then read the post in the box.
+
+**Say:**
+> "The AI writes a Bluesky post from the title, summary and expert's advice. I check it before anything goes out."
+
+**You should see:** A message `Post written. Read it, edit it, then schedule it.` The badge says **DRAFTED**, with the text in a box, an empty **Send at** field, a yellow **Schedule** button and **Write it again**.
+
+![Bluesky screen](screens/21-bluesky-screen.png)
+
+![Post written by the AI](screens/22-post-written.png)
+
+> **Read it properly.** If it adds a price, number, provider or claim that isn't in your title, summary or the expert's advice, edit it out or press **Write it again**. If it repeats the expert's advice, check the meaning didn't change.
+
+---
+
+## Scene 16: Schedule and send (4:00 – 4:10)
+
+**Screen:** Same Bluesky screen.
+
+**Do:** Leave **Send at** empty and click **Schedule**. Then scroll to the top, click **Check Bluesky now**, and wait for the message.
+
+**Say** (if the scheduler is on):
+> "I schedule it. My scheduler sends due posts; to save time, I'll run it now."
+
+**Say instead** (if it's off):
+> "I schedule it, then run the sending job with this button."
+
+**You should see:** First `Scheduled for the next check.` and the badge **SCHEDULED**. After the check: `Sent 1 post, found 0 new replies, suggested 0 answers.` The badge changes to **SENT**, with a **See it on Bluesky ↗** link.
+
+![Scheduled](screens/23-post-scheduled.png)
+
+*(The test screenshot shows other dummy answers below yours. There's no screenshot of the SENT state, because the test copy never sends anything.)*
+
+> If the scheduler is on, it may send the post between your two clicks. The message then says `Sent 0 posts`, but the badge already says **SENT**. That's fine.
+>
+> **If the badge says FAILED:** the error is shown under it. Cut, fix the cause (usually the app password), and click **Schedule** again.
+
+---
+
+## Scene 17: The post on Bluesky, and replies (4:10 – 4:28)
+
+**Screen:** Your profile on bsky.app, in the logged-out private window.
+
+**Do:** Reload. Show the "(automated)" name, the new post and its link card. Click the card so the answer page opens.
+
+**Say:**
+> "Here it is, on an account labelled automated, linking to our answer. For replies, the AI suggests a response and I approve each one. The code can't follow, like, repost or send direct messages."
+
+**You should see:** The post, with a card showing your answer's title and search text. The card opens your live page. Its address ends in `?utm_source=bluesky…`, which lets Google Analytics count visits from the post.
+
+> **Don't create a reply for the camera.** No friends and no second account of your own: that counts as faked engagement. If a real person has replied and you show the **Replies waiting for you** box, **blur their text and the "Open on Bluesky" link**.
+
+---
+
+## Scene 18: What broke and what's next (4:28 – 4:55)
+
+**Screen:** The desk's **Results** screen, `/admin?view=results`.
+
+**Do:** Click **Results** in the top bar. Scroll gently while you talk.
+
+**Say:**
+> "This screen tracks AI traffic and posts.
+> What broke? One misquoted fact rejected the whole draft, and retries hit my host's five-minute limit. Now only that fact and its sentences are dropped.
+> My code proves a quote exists, not that it supports the claim, so people check that.
+> Next, I'd pick questions from real search data. Thank you."
+
+**You should see:** The counter tiles, what to answer next, AI traffic, Bluesky post counts and the CSV upload. Small or zero numbers are expected, so don't present them as results.
+
+> Look at this screen off camera first. If anything personal is showing, such as an uploaded file's name, crop it out.
+
+**End of the video (about 4:55).**
+
+---
+
+## After recording: final checks before you upload
+
+- [ ] **The video is 5:00 or less**, with the ranking, drafting and post-writing waits cut.
+- [ ] **Watch it once, pausing on every screen.** Look for API keys, passwords, expert codes, the expert's email or phone, your Gmail avatar or inbox, Vercel or Neon screens, and any commenter's name.
+- [ ] The one-time link in Scene 9 is blurred.
+- [ ] Both sample images in Scene 10 carry the "Sample from my local test copy" caption.
+- [ ] Upload to **YouTube or X**, or send it with the submission (HR waived the LinkedIn post, so quote that in your submission email).
+- [ ] Open the link in a private window to make sure it plays without signing in.
+- [ ] Off camera: in Search Console, request indexing for the new answer's address.
+- [ ] The **one-page write-up** is separate. It needs how the engine works, the LLM prompts (the `.txt` files in the `api/*/prompts/` folders), how you checked the AI's output, what broke, and a line saying AI coding tools were used to build it.
