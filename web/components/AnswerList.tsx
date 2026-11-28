@@ -42,7 +42,12 @@ export default function AnswerList({ cards }: { cards: AnswerCard[] }) {
               <div>
                 <Link className="entry-list__title" href={`/q/${card.slug}`}>{card.title}</Link>
                 <p className="entry-list__preview">{card.preview}</p>
-                {card.trust && <p className="entry-list__trust">{card.trust}</p>}
+                {card.trust && (
+                  <p className="entry-list__trust">
+                    {card.trust}
+                    {card.bluesky && <> · <a href={card.bluesky} target="_blank" rel="noreferrer">Discuss on Bluesky ↗</a></>}
+                  </p>
+                )}
                 {card.providers.length > 0 && (
                   <ul className="provider-tags" aria-label="Sources cited from">
                     <li aria-hidden="true">Sources:</li>

@@ -49,6 +49,7 @@ export type Page = {
   decided_at: string;
   reviewer: string | null; // the expert who approved this answer, e.g. "Sanath W, Senior DevOps Engineer"
   facts: PublicFact[];
+  bluesky_url: string | null; // our Bluesky post about this answer, once it has been sent
 };
 
 /** The reviewers' public names, from GET /experts: {"sanath": "Sanath W, Senior DevOps Engineer", ...}. */

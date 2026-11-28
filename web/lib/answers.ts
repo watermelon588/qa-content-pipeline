@@ -2,7 +2,14 @@
 // (run from web/:  node --test lib/answers.test.mjs).
 
 /** One answer on the home page. `trust` is empty if the answer's details couldn't be loaded. */
-export type AnswerCard = { slug: string; title: string; preview: string; trust: string; providers: string[] };
+export type AnswerCard = {
+  slug: string;
+  title: string;
+  preview: string;
+  trust: string;
+  providers: string[];
+  bluesky: string | null; // link to our Bluesky post about it, once sent
+};
 
 /** The first ordinary paragraph of an answer: no headings, lists, tables, [n] fact markers or ** bold marks. */
 export function previewOf(body: string): string {

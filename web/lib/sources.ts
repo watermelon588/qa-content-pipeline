@@ -1,8 +1,8 @@
 // Provider pages offered as tick boxes on the draft form, so you don't have to hunt for URLs every time.
 // The public home page uses the same list to turn a source address into a provider's name.
 // Only add a page after checking that it downloads as readable text with the API's own downloader (pages drawn
-// by JavaScript don't: paste their text instead). Checked on 27 Nov 2026 from a laptop: each of these downloaded,
-// and every one except "P5 specs" had GPU prices in its text. Pages change, so the fact check still matters.
+// by JavaScript don't: paste their text instead). Re-checked on 28 Nov 2026 from a laptop: each of these downloaded
+// and had GPU prices next to GPU names in its text. Pages change, so the fact check still matters.
 // Any other page can still be typed into the form.
 
 export const KNOWN_SOURCES = [
@@ -13,7 +13,6 @@ export const KNOWN_SOURCES = [
   { group: "India", provider: "Cyfuture AI", page: "GPU pricing (₹ and $)", url: "https://cyfuture.ai/pricing" },
   { group: "India", provider: "Neysa", page: "GPU pricing ($)", url: "https://neysa.ai/pricing/" },
   { group: "Global", provider: "AWS", page: "Reserved GPU blocks ($, lists Mumbai)", url: "https://aws.amazon.com/ec2/capacityblocks/pricing/" },
-  { group: "Global", provider: "AWS", page: "P5 specs (no prices)", url: "https://aws.amazon.com/ec2/instance-types/p5/" },
   { group: "Global", provider: "Google Cloud", page: "GPU machine prices ($, check the region)", url: "https://cloud.google.com/products/compute/pricing/accelerator-optimized" },
   { group: "Global", provider: "RunPod", page: "GPU prices ($)", url: "https://www.runpod.io/pricing" },
   { group: "Global", provider: "Lambda", page: "GPU prices ($)", url: "https://lambda.ai/pricing" },

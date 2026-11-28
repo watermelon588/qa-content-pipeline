@@ -66,6 +66,15 @@ def read_page(slug: str):
         cur.execute("SELECT n, claim, source_url, checked_on FROM facts WHERE draft_id = %s ORDER BY n", (page["draft_id"],))
         cited = {int(n) for n in re.findall(r"\[(\d+)\]", page["body"])}  # the expert may have removed some
         page["facts"] = [f for f in cur.fetchall() if f["n"] in cited]
+        # our Bluesky post about this answer, once it has been sent (public anyway, so the home page can link it)
+        cur.execute("SELECT po.uri FROM posts po JOIN pages p ON p.id = po.page_id "
+                    "WHERE p.slug = %s AND po.status = 'sent'", (slug,))
+        post = cur.fetchone()
+    page["bluesky_url"] = None
+    if post:
+        # at://did:plc:abc/app.bsky.feed.post/xyz -> https://bsky.app/profile/did:plc:abc/post/xyz
+        _, _, did, _, rkey = post["uri"].split("/")
+        page["bluesky_url"] = f"https://bsky.app/profile/{did}/post/{rkey}"
     page["reviewer"] = EXPERTS.get(page.pop("expert"))  # the expert who approved THIS answer (None for older links)
 
     url = f"{SITE_URL}/q/{page['slug']}"

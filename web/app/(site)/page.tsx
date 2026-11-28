@@ -37,7 +37,7 @@ const count = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
 // GET /pages if the page ever feels slow. If one fails, that answer still shows with its search description.
 async function toCard(listed: Listed): Promise<AnswerCard> {
   const page = await api<Page>(`/pages/${encodeURIComponent(listed.slug)}`).catch(() => null);
-  const fallback = { slug: listed.slug, title: listed.title, preview: listed.meta_description, trust: "", providers: [] };
+  const fallback = { slug: listed.slug, title: listed.title, preview: listed.meta_description, trust: "", providers: [], bluesky: null };
   if (!page) return fallback;
   const checked = page.facts.map((f) => f.checked_on).sort().at(-1);
   const trust = [
@@ -51,6 +51,7 @@ async function toCard(listed: Listed): Promise<AnswerCard> {
     preview: previewOf(page.body) || listed.meta_description,
     trust,
     providers: [...new Set(page.facts.map((f) => providerOf(f.source_url)))],
+    bluesky: page.bluesky_url ?? null,
   };
 }
 
@@ -79,7 +80,7 @@ export default function Home() {
             <p className="label label--route">Plate 06 B2</p>
             <h1 className="display">{SECTION_TITLE}</h1>
             <p className="lede">{SECTION_LEDE}</p>
-            <p><span className="badge">First answers in review</span></p>
+            <p><span className="badge">Expert-approved answers</span></p>
             <p className="plate__note">
               Each page answers one question an Indian business owner asks before renting GPUs or cloud
               compute. Nothing is published here until a named expert has signed it.
